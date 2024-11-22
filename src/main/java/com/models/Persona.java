@@ -9,7 +9,6 @@ import java.util.Scanner;
 
 public abstract class Persona implements Comparable<Persona>{
 
-    private static int contador = 0;
     private int id;
     private String nombre;
     private String apellido;
@@ -20,8 +19,7 @@ public abstract class Persona implements Comparable<Persona>{
     private boolean active;
 
     public Persona() {
-        contador++;
-        this.id = contador;
+
     }
 
     public int getId() {

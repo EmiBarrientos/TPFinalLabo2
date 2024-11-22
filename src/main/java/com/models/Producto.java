@@ -13,7 +13,6 @@ import javax.swing.*;
 public class Producto implements Comparable<com.models.Producto> {
 
     private int idProd;
-    private static int contador=0;
     private String nombreProd;
     private String marcaProd;
     private CatProducto categoriaProd;
@@ -43,6 +42,7 @@ public class Producto implements Comparable<com.models.Producto> {
 
     public Producto() {
     }
+
 
 
     public void setIdProd(int idProd) {
@@ -208,14 +208,6 @@ public class Producto implements Comparable<com.models.Producto> {
        return false;
    }
 
-    // metodo para asignar id, despues de crear el producto y verificar en Productos se aplica este metodo
-    // esto evita que se creen productos con los mismos atributos pero distinto id en el inventario
-    public void asignarId(){
-        this.idProd = this.contador;
-        this.contador++;
-    }
-
-    // probablemente se necesite un metodo para cargar el Proveedor y sea argumento sea Proveedor proveedor;
 
 
     // para cambiar los atributos de un producto

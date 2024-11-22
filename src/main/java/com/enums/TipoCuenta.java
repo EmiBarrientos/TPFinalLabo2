@@ -1,5 +1,5 @@
 package com.enums;
 
 public enum TipoCuenta {
-    DOLAR,PESOS,LOQUEPINTE;
+    DOLAR,PESOSEFECTIVO,CREDITO,TRANSFERENCIAS;
 }

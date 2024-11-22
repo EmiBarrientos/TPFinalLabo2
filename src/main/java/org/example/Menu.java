@@ -21,6 +21,7 @@ public class Menu {
     private Productos productos = new Productos();
     private Movimientos movimientos = new Movimientos();
     private PedidosList pedidosList;
+    private Balances balances;
 
     private Cliente clienteGenerica=new Cliente();
     private Proveedor proveedorGenerico= new Proveedor();
@@ -331,7 +332,7 @@ public class Menu {
             tipoDeMovimiento = Mensajes.mensajeReturnEnumConOpciones(TipoDeMovimiento.class, "Tipo de Movimiento");
             pedidoGenerico = Comercializar.crearPedidoConDatosValidos(pedidosList, productos, tipoDeMovimiento, cuentaGenerico);
 
-            Comercializar.aplicarMovimiento(productos, cuentas, movimientos, pedidoGenerico, pedidosList);
+            Comercializar.aplicarMovimiento(productos, cuentas, movimientos, pedidoGenerico, pedidosList,balances, personas);
             cuentaGenerico = new Cuenta();
             DNIgenerico = "";
             pedidoGenerico = new Pedido();
@@ -363,7 +364,7 @@ public class Menu {
         cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas);
         boolean estado = (Mensajes.mensajeYesNO("Buscar los que estan pendientes?")==JOptionPane.YES_OPTION);
         int index = pedidosList.buscarPedido(cuentaGenerico.getId(),estado);
-        if (Mensajes.mensajeYesNO("\"¿Quiere buscar más pedidos?\"") == JOptionPane.YES_OPTION) {
+        if (Mensajes.mensajeYesNO("¿Quiere buscar más pedidos?") == JOptionPane.YES_OPTION) {
             index =-1;
             buscarPedidos();
         }
@@ -373,7 +374,7 @@ public class Menu {
         cuentaGenerico = Comercializar.buscarCuenta(personas,cuentas);
         int index = pedidosList.buscarPedido(cuentaGenerico.getId(),false);
         pedidoGenerico = pedidosList.getPedido(index) ;
-        Comercializar.aplicarMovimiento(productos,cuentas,movimientos,pedidoGenerico,pedidosList);
+        Comercializar.aplicarMovimiento(productos,cuentas,movimientos,pedidoGenerico,pedidosList,balances,personas);
         if (Mensajes.mensajeYesNO("\"¿Quiere ejecutar más pedidos?\"") == JOptionPane.YES_OPTION) {
             ejecutarPedido();
         }
@@ -410,6 +411,7 @@ public class Menu {
                         "Baja Cuenta",
                         "Ver Saldo de Cuenta por Personas",
                         "Listar Cuentas (Activas/Pasivas/Todas)",
+                        "Listar Balance (Activas/Pasivas/Todas)",
                         "Volver al menú principal"};
                 int seleccion;
                 do {
@@ -421,10 +423,11 @@ public class Menu {
                         //case 1 -> bajaCuenta();
                         case 2 -> verSaldoCuentaPersonas();
                         case 3 -> listarCuentas();
-                        case 4 -> JOptionPane.showMessageDialog(null, "Volviendo al menú principal...");
+                        case 4 -> listarBalance();
+                        case 5 -> JOptionPane.showMessageDialog(null, "Volviendo al menú principal...");
                         default -> JOptionPane.showMessageDialog(null, "Opción no válida");
                     }
-                } while (seleccion != 4);
+                } while (seleccion != 5);
     }
 
     private void activarCuenta() {
@@ -464,6 +467,19 @@ public class Menu {
         List<Listas> informeCuentas = this.cuentas.informeCuentas();
         ArchivoUtil archivoUtil = new ArchivoUtil<>(archivoCSV, Listas.class);
         archivoUtil.escribirArchivo(informeCuentas,";");
+        Mensajes.mensajeOut("Archivo: "+ archivoCSV+" creado");
+
+    }
+
+    private void listarBalance() {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String fechaHora = LocalDateTime.now().format(formatter);
+        String archivoCSV = "informeBalance_" + fechaHora + "_" + UUID.randomUUID() + ".CSV";
+        ArchivoUtil.crearArchivo(archivoCSV);
+        List<Listas> informe = this.balances.informeBalance();
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivoCSV, Listas.class);
+        archivoUtil.escribirArchivo(informe,";");
         Mensajes.mensajeOut("Archivo: "+ archivoCSV+" creado");
 
     }
@@ -520,8 +536,7 @@ public class Menu {
     }
 
     private void buscarPorProducto() {
-        String nombre = Mensajes.mensajeReturnString("Ingrese el Nombre del Producto");
-        productos.buscarProducto(nombre);
+        productos.buscarProductoNombre(Mensajes.mensajeReturnString("Escribir el Nombre del Producto a Comprar"));
     }
 
 }

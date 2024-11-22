@@ -4,7 +4,8 @@ public enum TipoDeMovimiento {
     VENTA(1),
     COMPRA(2),
     BAJA(3),
-    ALTA(4);
+    ALTA(4),
+    INTERNO(5);
 
     private int numero;
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 
 public class Cuenta {
-    private static int idContador=0;
+
     private int id;
     private Persona persona;
     private int idPersona;
@@ -18,8 +18,6 @@ public class Cuenta {
     private Boolean activa;
 
     public Cuenta(Persona persona, TipoCuenta tipo) {
-        this.id = idContador;
-        idContador++;
         this.persona = persona;
         this.idPersona = persona.getId();
         this.tipoCuenta = tipo;
@@ -84,6 +82,8 @@ public class Cuenta {
         return this;
     }
 
+    // devuele cuenta con todos los tipos de cuentas que hay para una persona
+    // esto lo utiliza cuando crea cuentas para una persona y la agrega a la lista de Cuentas
     public static ArrayList<Cuenta> cargarCuentasNuevaPersona(Persona p){
         ArrayList<Cuenta> cuentas = new ArrayList<>();
         for (TipoCuenta tipoCuenta : TipoCuenta.values()) {
@@ -99,7 +99,7 @@ public class Cuenta {
                         this.getPersona().getApellido()+"\n"+
                         this.getTipoCuenta()+"\n"+
                         this.getSaldo()+"\n"
-                ,"Es esta cuenta?" ,JOptionPane.YES_NO_OPTION);
+                +"Es esta cuenta?");
         return respuesta;
     }
 

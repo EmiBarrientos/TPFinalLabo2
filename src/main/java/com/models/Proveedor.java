@@ -9,19 +9,6 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Proveedor extends Persona {
-   // private TipoProveedor tipoProveedor;
-    //private Productos productosProv;
-
-
-    public Proveedor(String nombre, String apellido, String dni, Domicilio domicilio, TipoProveedor tipoProveedor) {
-        this.setNombre(nombre);
-        this.setApellido(apellido);
-        this.setDni(dni);
-        this.setDomicilio(domicilio);
-        this.setActive(true);
-        this.setTipoPersona(TipoPersona.PROVEEDOR);
-     //   this.tipoProveedor = tipoProveedor;
-    }
 
     public Proveedor(String nombre, String apellido, String dni, Domicilio domicilio) {
         this.setNombre(nombre);
@@ -33,7 +20,6 @@ public class Proveedor extends Persona {
     }
 
     public Proveedor(){
-        //productosProv = new Productos();
     }
 
     //public TipoProveedor getTipoProveedor() {

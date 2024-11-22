@@ -2,6 +2,7 @@ package com.models;
 
 import com.enums.TipoCuenta;
 import com.models.funciones.Listas;
+import com.models.funciones.Movimiento;
 
 
 import java.util.ArrayList;
@@ -24,8 +25,14 @@ public class Cuentas {
         return cuentas;
     }
 
-    public void add(Cuenta cuenta){
+    private void add(Cuenta cuenta){
+        int nuevoId= this.maxId()+1;
+        cuenta.setId(nuevoId);
         this.cuentas.add(cuenta);
+    }
+
+    public void addAll(List <Cuenta> listaAgregar){
+    this.cuentas.addAll(listaAgregar);
     }
 
     public Cuenta buscarCuentaPorId(int idCuenta) {
@@ -86,11 +93,42 @@ public class Cuentas {
         return informe;
     }
 
+    public void cargarCuentasNuevaPersonaProovedorROOT(Persona p){
+        ArrayList <Cuenta> cuentasNuevas = Cuenta.cargarCuentasNuevaPersona(p);
+        int i=0;
+        for ( Cuenta generic : cuentasNuevas ){
+            int a =i*2; // pares proovedor
+            generic.setId(a);
+            this.cuentas.add(generic);
+            i++;
+        }
+    }
+
+    public void cargarCuentasNuevaPersonaClienteROOT(Persona p){
+        ArrayList <Cuenta> cuentasNuevas = Cuenta.cargarCuentasNuevaPersona(p);
+        int i=0;
+        for ( Cuenta generic : cuentasNuevas ){
+            int a =i*2+1; // impares cliente
+            generic.setId(a);
+            this.cuentas.add(generic);
+            i++;
+        }
+    }
+
+    //lo utiliza en el menu
     public void cargarCuentasNuevaPersona(Persona p){
         ArrayList <Cuenta> cuentasNuevas = Cuenta.cargarCuentasNuevaPersona(p);
         for ( Cuenta generic : cuentasNuevas ){
             this.add(generic);
         }
     }
-
+    public int maxId(){
+        int maxId=0;
+        for(Cuenta genetic:  this.cuentas){
+            if(genetic.getId()>maxId){
+                maxId=genetic.getId();
+            }
+        }
+        return maxId;
+    }
 }

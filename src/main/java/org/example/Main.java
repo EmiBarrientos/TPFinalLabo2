@@ -5,6 +5,7 @@ import com.Menu.MenuGral;
 import com.enums.CatProducto;
 import com.enums.TipoCuenta;
 import com.enums.TipoDeMovimiento;
+import com.enums.TipoProveedor;
 import com.models.*;
 import com.models.funciones.Comercializar;
 import com.models.funciones.Movimiento;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.spec.MGF1ParameterSpec;
+import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.*;
 
@@ -30,11 +32,28 @@ public class Main {
         // MenuGral.menuPrincipal();
 
         Scanner entrada = new Scanner(System.in);
-        ArrayList<Persona> personaArrayList = MockDataGenerator.generatePersonas(1000);
-        ArrayList<Cuenta> cuentaArrayList = MockDataGenerator.generateCuentas(personaArrayList);
-        ArrayList<Producto> productoArrayList = MockDataGenerator.generateProductos(personaArrayList);
+        // todo esto va en una fucion inicializar
+        Personas personas = new Personas();
+        Cuentas cuentas = new Cuentas();
+        Productos productos = new Productos();
+        Comercializar.inicializarListas(personas,cuentas,productos); // corgo el usuario root y el producto movimiento
+        // preguntar si se quiere usar el mock...
+        List<Persona> personaArrayList = MockDataGenerator.generarPersonas2(1000);
+        List<Cuenta> cuentaArrayList = MockDataGenerator.generateCuentas(personaArrayList);
+        List<Producto> productoArrayList = MockDataGenerator.generarProductos2(5000,personaArrayList);
+        List<Pedido> pedidosArrayList = MockDataGenerator.generarPedidos(cuentaArrayList.size(),productoArrayList,10,5000);
+        personas.addAll(personaArrayList);
+        cuentas.addAll(cuentaArrayList);
+
+        productos.addAll(productoArrayList);
+        PedidosList pedidosList = new PedidosList(new ArrayList<>(pedidosArrayList));
+        Movimientos movimientos = MockDataGenerator.generateMovimientos(500,productos,cuentas,pedidosList);
+        // todo esto termina
 
         System.out.println("termino de usar el moock ---------------------------------------");
+
+
+
 
 
         System.out.println("Empieza productos copia array a Archivo-------------------------------------------------------------------------------------------------------");
@@ -53,7 +72,7 @@ public class Main {
 
         ArchivoUtil<Producto> archivoUtil = new ArchivoUtil<>(archivoCSV, Producto.class);
 
-        archivoUtil.escribirArchivo(productoArrayList, ";");
+        archivoUtil.escribirArchivo(productos.getProductos(), ";");
 
 
         List<Producto> productoListas = new ArrayList<>();
@@ -74,7 +93,7 @@ public class Main {
         }
 
         ArchivoUtil<Cuenta> archivoUtilCuenta = new ArchivoUtil<>(archivoCSV, Cuenta.class);
-        archivoUtilCuenta.escribirArchivo(cuentaArrayList, ";");
+        archivoUtilCuenta.escribirArchivo(cuentas.getCuentas(), ";");
         List<Cuenta> cuentasListas = archivoUtilCuenta.leerArchivo(";");
         cuentaArrayList= new ArrayList<>(cuentasListas);
         //archivoUtilCuenta.escribirArchivo(cuentaArrayList, ";");
@@ -92,7 +111,7 @@ public class Main {
         }
 
         ArchivoUtil<Persona> archivoUtilPersona = new ArchivoUtil<>(archivoCSV, Persona.class);
-        archivoUtilPersona.escribirArchivo(personaArrayList, ";");
+        archivoUtilPersona.escribirArchivo(personas.getPersonas(), ";");
         //System.out.println("-------------------------- fin de escritura de persona------------------------------------");
 
         //List<Persona> personasListas = new ArrayList<>();
@@ -151,11 +170,6 @@ public class Main {
         //System.out.println(productoArrayList.get(1));
         //System.out.println(productoArrayList.get(2));
 
-        Personas personas = new Personas(personaArrayList);
-        Cuentas cuentas = new Cuentas(cuentaArrayList);
-        Productos productos = new Productos(productoArrayList);
-        Movimientos movimientos = new Movimientos();
-        PedidosList pedidosList = new PedidosList();
 
         Menu menu = new Menu(pedidosList,personas,cuentas,productos,movimientos);
         menu.mostrarMenuPrincipal();

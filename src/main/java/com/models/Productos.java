@@ -82,11 +82,25 @@ public class Productos {
     // le agrega id
     // lo agrega
 
+    public int maxId(){
+        int maxId=0;
+        for(Producto genetic:  this.productos){
+            if(genetic.getIdProd()>maxId){
+                maxId=genetic.getIdProd();
+            }
+        }
+        return maxId;
+    }
+
     public void addProducto(Producto producto) {
         if (this.checkearNoExisteProducto(producto) == -1) {
-            producto.asignarId(); // asigna id a producto e incrementa el contador
+            producto.setIdProd(maxId()+1); // asigna id a producto e incrementa el contador
             productos.add(producto); // agrega el producto al inventario
         }
+    }
+
+    public void addAll(List <Producto> listaAgregar){
+        this.productos.addAll(listaAgregar);
     }
 
     // le paso un productoConAtributosCambiado
@@ -136,7 +150,7 @@ public class Productos {
     public Producto altaDeProducto (){
         Producto productoNuevo= new Producto();
         String nombre = Mensajes.mensajeReturnString("Ingrese el nombre del Producto");
-        if(-1==buscarProducto(nombre)){
+        if(this.buscarProductoNombre(nombre)==-1){
             Mensajes.mensajeOut("Ya existe el producto");
             return null;
         }
@@ -149,7 +163,7 @@ public class Productos {
     public Producto bajaDeProducto (){
         Producto productoNuevo= new Producto();
         String nombre = Mensajes.mensajeReturnString("Ingrese el nombre del Producto");
-        int index = buscarProducto(nombre);
+        int index = this.buscarProductoNombre(nombre);
         if(index==-1){
             Mensajes.mensajeOut("Ya existe el producto");
             return null;

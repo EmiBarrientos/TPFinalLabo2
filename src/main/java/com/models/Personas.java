@@ -4,10 +4,7 @@ import com.enums.TipoPersona;
 import com.models.funciones.Mensajes;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class Personas {
     private ArrayList<Persona> personas;
@@ -20,12 +17,35 @@ public class Personas {
         this.personas = new ArrayList<>();
     }
 
+    public void addAll(List<Persona> listaAgregar){
+        this.personas.addAll(listaAgregar);
+    }
     public ArrayList<Persona> getPersonas() {
         return personas;
     }
 
-    public void addPersona(Persona p){
+    public void addPersonaClienteDuena(Persona p){
+        p.setId(1);
         personas.add(p);
+    }
+
+    public void addPersonaProveedorDuena(Persona p){
+        p.setId(0);
+        personas.add(p);
+    }
+
+    public void addPersona(Persona p){
+        p.setId(maxId()+1);
+        personas.add(p);
+    }
+    public int maxId(){
+        int maxId=0;
+        for(Persona genetic:  this.personas){
+            if(genetic.getId()>maxId){
+                maxId=genetic.getId();
+            }
+        }
+        return maxId;
     }
 
     public void mostrarPersonas() {

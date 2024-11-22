@@ -9,7 +9,6 @@ import com.models.Producto;
 import java.time.LocalDate;
 
 public class Movimiento {
-    private static int idContador=0;
     private int id;
     private LocalDate fecha;
     private Cuenta cuenta = new Cuenta();
@@ -30,8 +29,6 @@ public class Movimiento {
                       Pedido productosComercializados, // el pedido
                       String descripcion,
                       LocalDate fecha) {
-        this.id = idContador;
-        this.idContador++;
         this.fecha = fecha;
         this.descripcion = descripcion;
         this.productosComercializados = productosComercializados;

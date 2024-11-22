@@ -17,6 +17,14 @@ public class PedidosList {
         this.pedidosList=new ArrayList<>();
     }
 
+    public ArrayList<Pedido> getPedidosList() {
+        return pedidosList;
+    }
+
+    public void setPedidosList(ArrayList<Pedido> pedidosList) {
+        this.pedidosList = pedidosList;
+    }
+
     public PedidosList(ArrayList<Pedido> pedidosList) {
         this.pedidosList = pedidosList;
     }
@@ -96,19 +104,31 @@ public class PedidosList {
         linea.setCampo2("Marca");
         linea.setCampo3("Nombre");
         linea.setCampo4("Cantidad");
+        linea.setCampo5("precioCompra");
+        linea.setCampo6("precioVenta");
+        linea.setCampo7("tipoPedido");
+        linea.setCampo8("Estado");
         informe.add(linea);
         linea = new Listas();
         for (Pedido generic : this.pedidosList) {
-            if (generic.isEjecutado() == estado) {
+            if (generic.isEjecutado() == estado || generic.isEjecutado() != estado) {// para que me saque todos
                 String numeroCuenta = String.valueOf(generic.getIdCuenta());
+                String tipoPedido = String.valueOf(generic.getTipoDePedido());
+                String estados = String.valueOf(generic.isEjecutado());
                 for (PedidoLinea lineaP : generic.getLineasPedidos()) {
                     String marcaProducto = lineaP.getProducto().getMarcaProd();
                     String nombreProducto = lineaP.getProducto().getNombreProd();
                     String cantidad = String.valueOf(lineaP.getCantidad());
+                    String precioCompra = String.valueOf(lineaP.getMontoIndividualCompra());
+                    String precioVenta = String.valueOf(lineaP.getMontoIndividualCompra());
                     linea.setCampo1(numeroCuenta);
                     linea.setCampo2(marcaProducto);
                     linea.setCampo3(nombreProducto);
                     linea.setCampo4(cantidad);
+                    linea.setCampo5(precioCompra);
+                    linea.setCampo6(precioVenta);
+                    linea.setCampo7(tipoPedido);
+                    linea.setCampo8(estados);
                 }
                 informe.add(linea);
                 linea = new Listas();

@@ -1,18 +1,25 @@
 package com.models.funciones;
 
+import com.enums.CatProducto;
 import com.enums.TipoCuenta;
 import com.models.*;
 import com.enums.TipoDeMovimiento;
+import org.example.Balance;
+import org.example.Balances;
 
 import javax.swing.*;
 import java.lang.module.FindException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Comercializar {
 
 
-    public static void aplicarMovimiento(Productos inventario, Cuentas cuentas, Movimientos movimientos, Pedido pedido, PedidosList pedidosList) {
+    public static void aplicarMovimiento(Productos inventario, Cuentas cuentas, Movimientos movimientos,
+                                         Pedido pedido, PedidosList pedidosList,
+                                         Balances balances, Personas personas) {
 
         if (JOptionPane.YES_OPTION==Mensajes.mensajeYesNO("¿Quiere ejecutar el pedido?")) {
             Cuenta cuentaAModificar = cuentas.buscarCuentaPorId(pedido.getIdCuenta());
@@ -35,6 +42,18 @@ public class Comercializar {
 
                     inventario.actualizarStockPorPedidos(movimiento.getProductosComercializados());
                     pedidosList.cambiarEstadoPedido(pedido);
+
+                    Comercializar.modificarSaldoCuentaPropia(pedido.getTipoDePedido(),cuentaAModificar.getTipoCuenta(),
+                            movimiento.getMontoTotal(),cuentas,personas); // modifica los saldos de las cuentas del ROOT
+
+                    if(pedido.getTipoDePedido()==TipoDeMovimiento.VENTA) {
+                        Balance balance = new Balance(LocalDate.now(), movimiento.getMontoTotal(), 0.0, cuentaAModificar.getTipoCuenta());
+                        balances.add(balance);
+                    }
+                    if(pedido.getTipoDePedido()==TipoDeMovimiento.COMPRA) {
+                        Balance balance = new Balance(LocalDate.now(), 0.0, movimiento.getMontoTotal(),cuentaAModificar.getTipoCuenta());
+                        balances.add(balance);
+                    }
                 }
         }
     }
@@ -177,6 +196,67 @@ public static Cuenta buscarCuenta(Personas personas, Cuentas cuentas){
         return cuentaGenerico;
 }
 
+public static void inicializarListas(Personas personas, Cuentas cuentas, Productos productos){
+    Domicilio domicilioROOT= new Domicilio("calle",1, 1,'a');
+    Proveedor proveedorROOT = new Proveedor("Dueno","Dueno","00000000", domicilioROOT);
+    Cliente clienteROOT = new Cliente("Dueno","Dueno","00000000", domicilioROOT);
+    personas.addPersonaClienteDuena(clienteROOT); // id 1
+    personas.addPersonaProveedorDuena(proveedorROOT); // id 0
+    ArrayList <Cuenta> cuentasNuevasProveedor = Cuenta.cargarCuentasNuevaPersona(proveedorROOT);
+    ArrayList <Cuenta> cuentasNuevasCliente = Cuenta.cargarCuentasNuevaPersona(clienteROOT);
+    cuentas.cargarCuentasNuevaPersonaClienteROOT(clienteROOT);
+    cuentas.cargarCuentasNuevaPersonaProovedorROOT(proveedorROOT);
+    Producto producto = new Producto("movimiento", "movimiento", CatProducto.CAT1, 1, 0, 0, proveedorROOT);
+    productos.addProducto(producto);
+}
+
+public static void movimientoInterno(Double montoTotal, Cuenta cuentaOrigen,
+                                     Cuenta cuentaDestino,
+                                     Cuentas cuentas, Movimientos movimientos, Productos productos){
+        if(cuentaOrigen.getTipoCuenta() != TipoCuenta.DOLAR && cuentaOrigen.getIdPersona() == cuentaDestino.getIdPersona()) {
+            Producto producto = productos.buscarProducto("movimiento");
+            PedidoLinea pedidoLinea = new PedidoLinea(producto, 0);
+            List<PedidoLinea> pedidosLineas = new ArrayList<>();
+            pedidosLineas.add(pedidoLinea);
+            Pedido pedido = new Pedido(pedidosLineas, TipoDeMovimiento.INTERNO);
+            pedido.setMontoTotal(-montoTotal);
+            pedido.setIdCuenta(cuentaOrigen.getId());
+            pedido.setEjecutado(true);
+            Movimiento movimientoOrigen = new Movimiento(TipoDeMovimiento.INTERNO, cuentaOrigen, pedido, "Movimiento Origen", LocalDate.now());
+            movimientos.add(movimientoOrigen); //  lo cargo al listado de movimientos
+            cuentaOrigen = movimientoOrigen.getCuenta(); // trae la cuenta nueva con el nuevo saldo
+            cuentas.modificarCuentaPorCuenta(cuentaOrigen);// setea el nuevo saldo en el arre
+
+            pedido.setMontoTotal(montoTotal);
+            Movimiento movimientoDestino = new Movimiento(TipoDeMovimiento.INTERNO, cuentaDestino, pedido, "Movimiento Destino", LocalDate.now());
+            movimientos.add(movimientoOrigen); //  lo cargo al listado de movimientos
+            cuentaDestino = movimientoDestino.getCuenta(); // trae la cuenta nueva con el nuevo saldo
+            cuentas.modificarCuentaPorCuenta(cuentaDestino);// setea el nuevo saldo en el arre
+        }
+    }
+
+    private static double modificarSaldoCuentaPropia(TipoDeMovimiento tipoDeMovimiento, TipoCuenta tipoCuenta,
+                                                   Double montoTotal, Cuentas cuentas, Personas personas){
+        Cuenta cuenta = cuentas.buscarCuentaPorPersonaTipoCuenta(personas.buscarPersona("Dueno"),tipoCuenta);
+        Double saldoAnterior = cuenta.getSaldo();
+        Double saldonuevo;
+        if(tipoDeMovimiento == TipoDeMovimiento.COMPRA){
+            montoTotal = -montoTotal;
+            saldonuevo = saldoAnterior + montoTotal;
+            cuenta.setSaldo(saldonuevo);
+            cuentas.modificarCuentaPorCuenta(cuenta);
+        }
+
+        if(tipoDeMovimiento == TipoDeMovimiento.VENTA){
+            saldonuevo = saldoAnterior + montoTotal;
+            cuenta.setSaldo(saldonuevo);
+            cuentas.modificarCuentaPorCuenta(cuenta);
+        }
+        else{
+            montoTotal =0.0;
+        }
+        return montoTotal;
+    }
 }
 
 

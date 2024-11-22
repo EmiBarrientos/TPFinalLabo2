@@ -27,7 +27,18 @@ public class Movimientos {
         this.movimientos = movimientos;
     }
 
+    public int maxId(){
+        int maxId=0;
+        for(Movimiento genetic:  this.movimientos){
+            if(genetic.getId()>maxId){
+                maxId=genetic.getId();
+            }
+        }
+        return maxId;
+    }
+
     public void add(Movimiento movimiento){
+        movimiento.setId(maxId()+1);
         this.movimientos.add(movimiento);
     }
 
