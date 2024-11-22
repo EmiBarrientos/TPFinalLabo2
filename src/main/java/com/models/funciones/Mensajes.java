@@ -11,6 +11,11 @@ import java.time.format.DateTimeFormatter;
 
 public class Mensajes {
 
+    public static String mensajeReturnStringConDesplegable(String[] opciones, String titulo) {
+        return  (String) JOptionPane.showInputDialog(null, "",
+            titulo, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+    }
+
 
     public static int mensajeReturnIntConOpciones(String[] opciones, String titulo){
     return  JOptionPane.showOptionDialog(null, "Seleccione una opción",

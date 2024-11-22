@@ -35,8 +35,10 @@ public class Main {
         ArrayList<Producto> productoArrayList = MockDataGenerator.generateProductos(personaArrayList);
 
         System.out.println("termino de usar el moock ---------------------------------------");
-        System.out.println("Empieza productos copia array a Archivo-------------------------------------------------------------------------------------------------------");
 
+
+        System.out.println("Empieza productos copia array a Archivo-------------------------------------------------------------------------------------------------------");
+// productos
         String archivoCSV = "productos.csv";
 
 
@@ -50,7 +52,10 @@ public class Main {
         }
 
         ArchivoUtil<Producto> archivoUtil = new ArchivoUtil<>(archivoCSV, Producto.class);
+
         archivoUtil.escribirArchivo(productoArrayList, ";");
+
+
         List<Producto> productoListas = new ArrayList<>();
                 productoListas = archivoUtil.leerArchivo(";");
                 productoArrayList= new ArrayList<>(productoListas);
@@ -70,10 +75,9 @@ public class Main {
 
         ArchivoUtil<Cuenta> archivoUtilCuenta = new ArchivoUtil<>(archivoCSV, Cuenta.class);
         archivoUtilCuenta.escribirArchivo(cuentaArrayList, ";");
-        List<Cuenta> cuentasListas = new ArrayList<>();
-        cuentasListas = archivoUtilCuenta.leerArchivo(";");
+        List<Cuenta> cuentasListas = archivoUtilCuenta.leerArchivo(";");
         cuentaArrayList= new ArrayList<>(cuentasListas);
-        archivoUtilCuenta.escribirArchivo(cuentaArrayList, ";");
+        //archivoUtilCuenta.escribirArchivo(cuentaArrayList, ";");
 
 
         // personas
@@ -89,16 +93,16 @@ public class Main {
 
         ArchivoUtil<Persona> archivoUtilPersona = new ArchivoUtil<>(archivoCSV, Persona.class);
         archivoUtilPersona.escribirArchivo(personaArrayList, ";");
-        System.out.println("-------------------------- fin de escritura de persona------------------------------------");
+        //System.out.println("-------------------------- fin de escritura de persona------------------------------------");
 
-        List<Persona> personasListas = new ArrayList<>();
-        personasListas = archivoUtilPersona.leerArchivoPersonas(";");
-        System.out.println("-------------------------- fin de lectura de persona------------------------------------");
-        personaArrayList= new ArrayList<>(personasListas);
-        archivoUtilPersona.escribirArchivo(personaArrayList, ";");
+        //List<Persona> personasListas = new ArrayList<>();
+        //personasListas = archivoUtilPersona.leerArchivoPersonas(";");
+        //System.out.println("-------------------------- fin de lectura de persona------------------------------------");
+        //personaArrayList= new ArrayList<>(personasListas);
+        //archivoUtilPersona.escribirArchivo(personaArrayList, ";");
 
         // fin de prueba de archivos
-
+/*
         Domicilio domicilioModelo = new Domicilio("Jose Ingenieros",1765,0,'a');
 
         Cliente clienteModelo = new Cliente("Agustin","Malagutti","30196270",domicilioModelo);
@@ -136,7 +140,9 @@ public class Main {
 
         //System.out.println(personaArrayList.get(1));
         //System.out.println(cuentaArrayList.get(1));
+  */
         System.out.println(cuentaArrayList.get(1).getPersona().getDni());
+        System.out.println(cuentaArrayList.get(1).getPersona().getTipoPersona());
         System.out.println(cuentaArrayList.get(1).getTipoCuenta());
         System.out.println(productoArrayList.get(1).getNombreProd());
 

@@ -12,7 +12,6 @@ public class Pedido {
     private Double montoTotal;
     private int idCuenta;
     private boolean ejecutado=false; // cambia a verdadero cuando se convierte en movimiento
-    private boolean eliminado=false; // cambia a verdadero si se elimina
     private int id;
 
     public Pedido() {
@@ -27,13 +26,6 @@ public class Pedido {
         this.calcularMontoTotal();
     }
 
-    public boolean isEliminado() {
-        return eliminado;
-    }
-
-    public void setEliminado(boolean eliminado) {
-        this.eliminado = eliminado;
-    }
 
     public int getId() {
         return id;
@@ -173,8 +165,7 @@ public class Pedido {
     @Override
     public String toString() {
         return getClass().getSimpleName() + " [id=" + id + ", idCuenta=" + idCuenta + ", tipoDePedido=" + tipoDePedido
-                + ", montoTotal=" + montoTotal + ", ejecutado=" + ejecutado + ", eliminado=" + eliminado
-                + ", lineasPedidoLineas=" + lineasPedidoLineas + "]";
+                + ", montoTotal=" + montoTotal + ", ejecutado=" + ejecutado +  ", lineasPedidoLineas=" + lineasPedidoLineas + "]";
     }
 
 

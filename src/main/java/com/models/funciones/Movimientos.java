@@ -1,5 +1,6 @@
 package com.models.funciones;
 
+import com.models.Cuenta;
 import com.models.Persona;
 
 import javax.swing.*;
@@ -67,6 +68,48 @@ public class Movimientos {
     {
         this.add(movimientoOriginal.invertirMovimiento());
     }
+
+    public List<Listas> informeMovimientos() {
+        Listas linea = new Listas();
+        List<Listas> informe= new ArrayList<>();
+        linea.setCampo1("Fecha");
+        linea.setCampo2("Id Movimiento");
+        linea.setCampo3("Id Cuenta");
+        linea.setCampo4("Tipo");
+        linea.setCampo5("Tipo Movimiento");
+        linea.setCampo6("Numero Titular");
+        linea.setCampo7("Saldo Antes Cuenta");
+        linea.setCampo8("Saldo Despues Cuenta");
+        linea.setCampo9("Monto Total");
+        informe.add(linea);
+        linea = new Listas();
+        for (Movimiento generic : this.movimientos) {
+            String fecha = String.valueOf(generic.getFecha());
+            String id = String.valueOf(generic.getId());
+            String idCuenta = String.valueOf(generic.getCuenta().getId());
+            String tipoCuenta = String.valueOf(generic.getCuenta().getTipoCuenta());
+            String tipoMovimiento = String.valueOf(generic.getProductosComercializados().getTipoDePedido());
+            String dni = String.valueOf(generic.getCuenta().getPersona().getDni());
+            String saldoAntes = String.valueOf(generic.getSaldoAnterior());
+            String saldoDespues = String.valueOf(generic.getSaldoModificado());
+            String MontoTotal = String.valueOf(generic.getMontoTotal());
+
+            linea.setCampo1(fecha);
+            linea.setCampo2(id);
+            linea.setCampo3(idCuenta);
+            linea.setCampo4(tipoCuenta);
+            linea.setCampo5(tipoMovimiento);
+            linea.setCampo6(dni);
+            linea.setCampo7(saldoAntes);
+            linea.setCampo8(saldoDespues);
+            linea.setCampo9(MontoTotal);
+            informe.add(linea);
+            linea = new Listas();
+        }
+
+        return informe;
+    }
+
 
 
 }

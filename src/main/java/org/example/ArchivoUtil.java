@@ -390,7 +390,6 @@ public class ArchivoUtil<T> {
         String tipoDePedidoStr = datos.substring(datos.indexOf("tipoDePedido=") + 13, datos.indexOf(", montoTotal="));
         String montoTotal = datos.substring(datos.indexOf("montoTotal=") + 11, datos.indexOf(", ejecutado="));
         String ejecutadoStr = datos.substring(datos.indexOf("ejecutado=") + 10, datos.indexOf(", eliminado="));
-        String eliminadoStr = datos.substring(datos.indexOf("eliminado=") + 10, datos.indexOf(", lineasPedidoLineas="));
         String lineasPedidoLineasStr = datos.substring(datos.indexOf("lineasPedidoLineas=") + 19, datos.lastIndexOf("]"));
 
         // Mapear los valores extraídos a los atributos del objeto Pedido
@@ -399,7 +398,7 @@ public class ArchivoUtil<T> {
         pedido.setTipoDePedido(TipoDeMovimiento.valueOf(tipoDePedidoStr)); // Enum convertido desde String
         pedido.setMontoTotal(Double.parseDouble(montoTotal));
         pedido.setEjecutado(Boolean.parseBoolean(ejecutadoStr));
-        pedido.setEliminado(Boolean.parseBoolean(eliminadoStr));
+
 
         List<PedidoLinea> lineasPedido = crearLineasPedidoDesdeString(lineasPedidoLineasStr);
         pedido.setLineasPedidos(lineasPedido);
@@ -511,7 +510,6 @@ public class ArchivoUtil<T> {
         proveedor.setEmail(email);
         proveedor.setTipoPersona(crearEnumDesdeString(tipoPersona,TipoPersona.class));
         proveedor.setActive(Boolean.parseBoolean(active));
-        System.out.println(proveedor);
         return proveedor;
         // Crear y devolver objeto Persona específico
 
@@ -552,6 +550,19 @@ public class ArchivoUtil<T> {
             System.err.println("Error: El valor proporcionado es nulo.");
             return null;
         }
+    }
+
+    public static void crearArchivo(String archivCSV) {
+
+        if (!Files.exists(Paths.get(archivCSV))) {
+            try {
+                Files.createFile(Paths.get(archivCSV));
+                System.out.println("Archivo creado: " + archivCSV);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }

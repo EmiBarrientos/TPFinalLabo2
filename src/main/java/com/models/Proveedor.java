@@ -5,6 +5,7 @@ import com.enums.TipoProveedor;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Proveedor extends Persona {
@@ -58,7 +59,7 @@ public class Proveedor extends Persona {
         return getClass().getSimpleName() + " [id=" + this.getId() + ", nombre=" + this.getNombre() +
                 ", apellido=" + this.getApellido()
                 + ", dni=" + this.getDni() + ", domicilio=" + this.getDomicilio() + ", tipoPersona=" +
-                this.getTipoPersona() + ", email=" + this.getEmail() + ", active=" + this.getActive() +", tipoProveedor=" + "]";
+                this.getTipoPersona() + ", email=" + this.getEmail() + ", active=" + this.getActive() + "]";
     }
 
     @Override
@@ -143,6 +144,29 @@ public class Proveedor extends Persona {
         return p;
     }
 
+    //************************************ cosas nuevas
+    @Override
+    public boolean equals(Object obj) {
+        // Verificar si es el mismo objeto
+        if (this == obj) {
+            return true;
+        }
+        // Verificar si el objeto es nulo o de tipo diferente
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
 
+        Proveedor person = (Proveedor) obj;
+        return Objects.equals(this.getId(), person.getId()) &&
+                Objects.equals(this.getNombre(), person.getNombre()) &&
+                Objects.equals(this.getApellido(), person.getApellido()) &&
+                Objects.equals(this.getEmail(), person.getEmail()) &&
+                Objects.equals(this.getDomicilio(), person.getDomicilio());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getId(), this.getNombre(), this.getApellido(), this.getEmail(), this.getDomicilio());
+    }
 
 }

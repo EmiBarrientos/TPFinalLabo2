@@ -17,13 +17,22 @@ public class Comercializar {
         if (JOptionPane.YES_OPTION==Mensajes.mensajeYesNO("¿Quiere ejecutar el pedido?")) {
             Cuenta cuentaAModificar = cuentas.buscarCuentaPorId(pedido.getIdCuenta());
             String descripcion = Mensajes.mensajeReturnString("Ingrese Descripcion del Movimiento");
-                 Movimiento movimiento = new Movimiento(pedido.getTipoDePedido(),cuentaAModificar,
-                         pedido, descripcion, LocalDate.now()); // crea un movimiento
+                Movimiento movimiento = new Movimiento(pedido.getTipoDePedido(),cuentaAModificar,
+                         pedido, descripcion, LocalDate.now()); // crea un movimiemnto
 
                 if (movimiento.mostrarMovimiento() == JOptionPane.YES_OPTION) {
+
+                    // Crear un metodo que: IF CUENTA A MODIFICAR ES DOLAR
+                    // (PREGUNTAR EL VALOR DEL BLUE)
+                    //    Aplique SET al movimiento
+                    //    private Double montoTotal; (calcula en nuevo en dolares)
+                    //    private Double saldoModificado; (calcula el nuevo usando el movimiento.getSaldoAnterior + montoTotal
+                    //    setea la cueta que trae movimiento.getCuenta() con el nuevo valor de saldo
+                    //    sigue desde aca
                     movimientos.add(movimiento); // lo cargo al listado de movimientos
                     cuentaAModificar = movimiento.getCuenta(); // trae la cuenta nueva con el nuevo saldo
                     cuentas.modificarCuentaPorCuenta(cuentaAModificar);// setea el nuevo saldo en el arreglo de cuentas
+
                     inventario.actualizarStockPorPedidos(movimiento.getProductosComercializados());
                     pedidosList.cambiarEstadoPedido(pedido);
                 }
@@ -93,7 +102,7 @@ public class Comercializar {
         int cantidad;
         int stock;
         Producto producto = new Producto();
-        Pedido pedidoGenerico = null;
+        Pedido pedidoGenerico = new Pedido();
         PedidoLinea lineaPedidoLinea;
 
         // buscando  o creando producto
@@ -139,7 +148,6 @@ public class Comercializar {
                 lineaPedidoLinea = new PedidoLinea(producto, cantidad);
 
                 if (lineaPedidoLinea.mostrarPedido() == JOptionPane.YES_OPTION) { // muestro antes de agregar
-                    pedidoGenerico = new Pedido();
                     pedidoGenerico.addLineaDePedido(tipoDeMovimiento, lineaPedidoLinea);
                 }
             }

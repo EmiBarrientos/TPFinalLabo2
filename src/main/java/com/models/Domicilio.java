@@ -1,6 +1,7 @@
 package com.models;
 
 import javax.swing.*;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Domicilio {
@@ -55,10 +56,13 @@ public class Domicilio {
         return this;
     }
 
+
+
     @Override
     public String toString() {
         return "Domicilio [calle=" + calle + ", altura=" + altura + ", piso=" + piso + ", depto=" + depto + "]";
     }
+
 
     //--
     public static Domicilio cargarDomicilio(){
@@ -93,5 +97,17 @@ public class Domicilio {
         //System.out.println("ingrese el depto");
         //domicilio.setDepto(entrada.nextLine().charAt(0));*/
     return domicilio;
+    }
+
+//************************************ cosas nuevas
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true; // Reflexividad
+        if (obj == null || getClass() != obj.getClass()) return false; // Verifica tipo
+        Domicilio other = (Domicilio) obj; // Conversión segura
+        return Objects.equals(calle, other.calle) &&
+                altura == other.altura &&
+                piso == other.piso &&
+                depto == other.depto;
     }
 }

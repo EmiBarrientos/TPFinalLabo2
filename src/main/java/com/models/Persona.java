@@ -113,12 +113,8 @@ public abstract class Persona implements Comparable<Persona>{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
         Persona person = (Persona) o;
-
-        if (this.hashCode() != person.hashCode()) {
-            return false;
-        }
         return id == person.id && Objects.equals(nombre, person.nombre) && Objects.equals(apellido, person.apellido) && Objects.equals(email, person.email) && Objects.equals(domicilio, person.domicilio);
     }
 

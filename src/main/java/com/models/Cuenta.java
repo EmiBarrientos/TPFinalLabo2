@@ -1,7 +1,11 @@
 package com.models;
 import com.enums.TipoCuenta;
+import com.models.funciones.Listas;
+import com.models.funciones.Mensajes;
 
+import javax.swing.*;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Cuenta {
@@ -86,6 +90,17 @@ public class Cuenta {
             cuentas.add(new Cuenta(p, tipoCuenta));
         }
         return cuentas;
+    }
+
+    public int mostrarCuenta(){
+        int respuesta = Mensajes.mensajesReturnINT(
+                this.getActiva()+"\n"+
+                        this.getPersona().getDni()+"\n"+
+                        this.getPersona().getApellido()+"\n"+
+                        this.getTipoCuenta()+"\n"+
+                        this.getSaldo()+"\n"
+                ,"Es esta cuenta?" ,JOptionPane.YES_NO_OPTION);
+        return respuesta;
     }
 
 

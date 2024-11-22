@@ -4,13 +4,15 @@ import com.enums.TipoCuenta;
 import com.enums.TipoDeMovimiento;
 import com.enums.TipoPersona;
 import com.models.*;
-import com.models.funciones.Comercializar;
-import com.models.funciones.Mensajes;
-import com.models.funciones.Movimiento;
-import com.models.funciones.Movimientos;
+import com.models.funciones.*;
 
 import javax.swing.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Menu {
     private Scanner entrada = new Scanner(System.in);
@@ -292,17 +294,17 @@ public class Menu {
             seleccion = Mensajes.mensajeReturnIntConOpciones(opcionesPedidos,"Menu Pedidos");
             switch (seleccion) {
                 case 0 -> crearPedido(); /// crea un pedido y tambien la da opcion de ejecutarlo
-                //case 1 -> buscarPedidos(); //escribirlo (abrir por fecha y persona)
-                //case 2 -> modificarPedido(); //escribirlo tambien modifica o remueve solo no ejecutados
-                //case 3 -> ejecutarPedido(); //escribirlo tambien modifica o remueve solo no ejecutados
-                //case 4 -> ListarPedidos(); //escribirlo (abrir por fecha y persona)
+                case 1 -> buscarPedidos(); //escribirlo (abrir por fecha y persona)
+                case 2 -> eliminarPedidos(); //solo no ejecutados
+                case 3 -> ejecutarPedido(); //escribirlo tambien modifica o remueve solo no ejecutados
+                case 4 -> ListarPedidos(); //escribirlo (abrir por fecha y persona)
                 case 5 -> anularMovimiento(); // eliminar movimiento
                 case 6 -> buscarUnMovimiento(); //escribirlo (abrir por fecha y persona)
-                //case 7 -> ListarMovimientos(); //escribirlo (abrir por fecha y persona)
+                case 7 -> ListarMovimientos(); //escribirlo (abrir por fecha y persona)
                 case 8 -> Mensajes.mensajeOut("Volviendo al menú principal...");
                 default -> Mensajes.mensajeOut( "Opción no válida");
             }
-        } while (seleccion != 4);
+        } while (seleccion != 8);
     }
 
     private void anularMovimiento() {
@@ -341,27 +343,66 @@ public class Menu {
     }
 
 
-    private void modificarPedido() {
-
+    private void eliminarPedidos() {
+        String[] opcion ={"Buscar y eliminar un Pedido", "Eliminar todos los Pedidos Pendientes"};
+        int eleccion = Mensajes.mensajeReturnIntConOpciones(opcion,"Elija una opcion");
+        if (eleccion == 0 ){
+            cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas);
+            pedidosList.eliminarPedidoPendiente(cuentaGenerico.getId());
+        }
+        if (eleccion==1){
+            if(Mensajes.mensajeYesNO("confirma elimnacion de todos los pendientes")==
+            JOptionPane.YES_OPTION){pedidosList.eliminarTodosLosPendientes();}
+        }
         if (Mensajes.mensajeYesNO("¿Quiere modificar mas Pedidos?") == JOptionPane.YES_OPTION) {
-            modificarPedido();
+            eliminarPedidos();
         }
     }
 
-    private void eliminarPedido() {
-        Comercializar.anularMovimientoMenus(movimientos,cuentas, productos,personas);
-        if (Mensajes.mensajeYesNO("\"¿Quiere anular más Movimientos?\"") == JOptionPane.YES_OPTION) {
-            eliminarPedido();
-        }
-    }
-
-
-    private void buscarPedidos() {
-
+    private int buscarPedidos() {
+        cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas);
+        boolean estado = (Mensajes.mensajeYesNO("Buscar los que estan pendientes?")==JOptionPane.YES_OPTION);
+        int index = pedidosList.buscarPedido(cuentaGenerico.getId(),estado);
         if (Mensajes.mensajeYesNO("\"¿Quiere buscar más pedidos?\"") == JOptionPane.YES_OPTION) {
+            index =-1;
             buscarPedidos();
         }
+        return index;
     }
+    private void ejecutarPedido() {
+        cuentaGenerico = Comercializar.buscarCuenta(personas,cuentas);
+        int index = pedidosList.buscarPedido(cuentaGenerico.getId(),false);
+        pedidoGenerico = pedidosList.getPedido(index) ;
+        Comercializar.aplicarMovimiento(productos,cuentas,movimientos,pedidoGenerico,pedidosList);
+        if (Mensajes.mensajeYesNO("\"¿Quiere ejecutar más pedidos?\"") == JOptionPane.YES_OPTION) {
+            ejecutarPedido();
+        }
+    }
+
+    private void ListarPedidos(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String fechaHora = LocalDateTime.now().format(formatter);
+        String archivoCSV = "informePedidos_" + fechaHora + "_" + UUID.randomUUID() + ".CSV";
+        ArchivoUtil.crearArchivo(archivoCSV);
+        List<Listas> informePendienteEjecutado = this.pedidosList.informePendienteEjecutado(false);
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivoCSV, Listas.class);
+        archivoUtil.escribirArchivo(informePendienteEjecutado,";");
+        Mensajes.mensajeOut("Archivo: "+ archivoCSV+" creado");
+    }
+
+    private void ListarMovimientos(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String fechaHora = LocalDateTime.now().format(formatter);
+        String archivoCSV = "informeMovimientos_" + fechaHora + "_" + UUID.randomUUID() + ".CSV";
+        ArchivoUtil.crearArchivo(archivoCSV);
+        List<Listas> informe = this.movimientos.informeMovimientos();
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivoCSV, Listas.class);
+        archivoUtil.escribirArchivo(informe,";");
+        Mensajes.mensajeOut("Archivo: "+ archivoCSV+" creado");
+    }
+
+
+
 
     private void menuCuentas() {
                 String[] opcionesCuentas = {
@@ -378,8 +419,8 @@ public class Menu {
                     switch (seleccion) {
                         //case 0 -> activarCuenta();
                         //case 1 -> bajaCuenta();
-                        //case 2 -> verSaldoCuentaPersonas();
-                        //case 3 -> listarCuentas();
+                        case 2 -> verSaldoCuentaPersonas();
+                        case 3 -> listarCuentas();
                         case 4 -> JOptionPane.showMessageDialog(null, "Volviendo al menú principal...");
                         default -> JOptionPane.showMessageDialog(null, "Opción no válida");
                     }
@@ -400,19 +441,31 @@ public class Menu {
         }
     }
 
-    private void verSaldoCuentaPersonas() {
+    private Cuenta verSaldoCuentaPersonas() {
 
-        if (Mensajes.mensajeYesNO("¿Quiere ver el saldo de otra Persona?") == JOptionPane.YES_OPTION) {
-            verSaldoCuentaPersonas();
+        Cuenta respuesta=null;
+        cuentaGenerico = Comercializar.buscarCuenta(personas,cuentas);
+        if(cuentaGenerico.mostrarCuenta()==JOptionPane.YES_OPTION){
+            respuesta = cuentaGenerico;
         }
+        if (Mensajes.mensajeYesNO("¿Quiere ver el saldo de otra Persona?") == JOptionPane.YES_OPTION) {
+            return verSaldoCuentaPersonas();
+        }
+        return respuesta;
     }
 
 
     private void listarCuentas() {
 
-        if (Mensajes.mensajeYesNO("¿Quiere ver el saldo de otra Persona?") == JOptionPane.YES_OPTION) {
-            verSaldoCuentaPersonas();
-        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String fechaHora = LocalDateTime.now().format(formatter);
+        String archivoCSV = "informeCuentas_" + fechaHora + "_" + UUID.randomUUID() + ".CSV";
+        ArchivoUtil.crearArchivo(archivoCSV);
+        List<Listas> informeCuentas = this.cuentas.informeCuentas();
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivoCSV, Listas.class);
+        archivoUtil.escribirArchivo(informeCuentas,";");
+        Mensajes.mensajeOut("Archivo: "+ archivoCSV+" creado");
+
     }
 
 
@@ -423,7 +476,6 @@ public class Menu {
                 "Modificación",
                 "Listado",
                 "Buscar por producto",
-                "Buscar por proveedor",
                 "Volver al menú principal" };
         int seleccion;
         do {
@@ -436,7 +488,6 @@ public class Menu {
                 case 2 -> modificarProducto();
                 case 3 -> listadoProductos();
                 case 4 -> buscarPorProducto();
-                case 5 -> buscarPorProveedor();
                 case 6 -> JOptionPane.showMessageDialog(null, "Volviendo al menú principal...");
                 default -> JOptionPane.showMessageDialog(null, "Opción no válida");
             }
@@ -444,13 +495,11 @@ public class Menu {
     }
 
     private void altaProducto() {
-        String producto = JOptionPane.showInputDialog("Ingrese el nombre del nuevo producto:");
-        JOptionPane.showMessageDialog(null, "Producto " + producto + " dado de alta.");
+        productos.altaDeProducto();
     }
 
     private void bajaProducto() {
-        String producto = JOptionPane.showInputDialog("Ingrese el nombre del producto a dar de baja:");
-        JOptionPane.showMessageDialog(null, "Producto " + producto + " dado de baja.");
+       productos.bajaDeProducto();
     }
 
     private void modificarProducto() {
@@ -460,19 +509,19 @@ public class Menu {
     }
 
     private void listadoProductos() {
-        JOptionPane.showMessageDialog(null, "Mostrando listado de productos...");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String fechaHora = LocalDateTime.now().format(formatter);
+        String archivoCSV = "informeProductos_" + fechaHora + "_" + UUID.randomUUID() + ".CSV";
+        ArchivoUtil.crearArchivo(archivoCSV);
+        List<Listas> informeCuentas = this.productos.informeProductos();
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivoCSV, Listas.class);
+        archivoUtil.escribirArchivo(informeCuentas,";");
+        Mensajes.mensajeOut("Archivo: "+ archivoCSV+" creado");
     }
 
     private void buscarPorProducto() {
-        String productoNombre = JOptionPane.showInputDialog("Ingrese el nombre del producto a buscar:");
-        JOptionPane.showMessageDialog(null, "Mostrando información del producto: " + producto);
-        productos.mostrarProductos(productoNombre);
+        String nombre = Mensajes.mensajeReturnString("Ingrese el Nombre del Producto");
+        productos.buscarProducto(nombre);
     }
-
-    private void buscarPorProveedor() {
-        String proveedor = JOptionPane.showInputDialog("Ingrese el nombre del proveedor:");
-        JOptionPane.showMessageDialog(null, "Mostrando productos del proveedor: " + proveedor);
-    }
-
 
 }

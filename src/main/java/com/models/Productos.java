@@ -1,10 +1,12 @@
 package com.models;
 
+import com.models.funciones.Listas;
 import com.models.funciones.Mensajes;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class Productos {
@@ -131,6 +133,33 @@ public class Productos {
         return -1;
     }
 
+    public Producto altaDeProducto (){
+        Producto productoNuevo= new Producto();
+        String nombre = Mensajes.mensajeReturnString("Ingrese el nombre del Producto");
+        if(-1==buscarProducto(nombre)){
+            Mensajes.mensajeOut("Ya existe el producto");
+            return null;
+        }
+        productoNuevo = Producto.cargarProducto();
+        this.addProducto(productoNuevo);
+        Mensajes.mensajeOut("Producto cargado");
+        return productoNuevo;
+    }
+
+    public Producto bajaDeProducto (){
+        Producto productoNuevo= new Producto();
+        String nombre = Mensajes.mensajeReturnString("Ingrese el nombre del Producto");
+        int index = buscarProducto(nombre);
+        if(index==-1){
+            Mensajes.mensajeOut("Ya existe el producto");
+            return null;
+        }
+        productoNuevo = Producto.cargarProducto();
+        this.productos.remove(index);
+        Mensajes.mensajeOut("Producto Dado de Baja");
+        return productoNuevo;
+    }
+
     public int buscarProductoMarca(String marca) {
         int i = 0;
         for (Producto generic : this.productos) {
@@ -156,12 +185,50 @@ public class Productos {
     return null;
     }
 
+
+    public List<Listas> informeProductos() {
+        Listas linea = new Listas();
+        List<Listas> informe= new ArrayList<>();
+        linea.setCampo1("Id Cuenta");
+        linea.setCampo2("Categoria");
+        linea.setCampo3("Nombre Proveedor");
+        linea.setCampo4("Marca del Producto");
+        linea.setCampo5("Nombre del Producto");
+        linea.setCampo6("Stock del Producto");
+        informe.add(linea);
+        linea = new Listas();
+        for (Producto generic : this.productos) {
+            String idCuenta = String.valueOf(generic.getIdProd());
+            String categoria = String.valueOf(generic.getCategoriaProd());
+            String nombreProveedor = String.valueOf(generic.getProveedor().getNombre());
+            String marca = String.valueOf(generic.getMarcaProd());
+            String nombre = String.valueOf(generic.getNombreProd());
+            String stock = String.valueOf(generic.getStock());
+
+            linea.setCampo1(idCuenta);
+            linea.setCampo2(categoria);
+            linea.setCampo3(nombreProveedor);
+            linea.setCampo4(marca);
+            linea.setCampo5(nombre);
+            linea.setCampo6(stock);
+
+            informe.add(linea);
+            linea = new Listas();
+        }
+
+        return informe;
+    }
+
+
     public void mostrarProductos(String nombre){
         for(Producto generic : this.productos){
             if(nombre == generic.getNombreProd()){
             System.out.println(generic);}
         }
     }
+
+
+
 
     public void mostrarProductos(Proveedor proveedor){
         for(Producto generic : this.productos){
