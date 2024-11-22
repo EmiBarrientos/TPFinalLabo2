@@ -21,7 +21,7 @@ public class Menu {
     private Productos productos = new Productos();
     private Movimientos movimientos = new Movimientos();
     private PedidosList pedidosList;
-    private Balances balances;
+    private Balances balances= new Balances();
 
     private Cliente clienteGenerica=new Cliente();
     private Proveedor proveedorGenerico= new Proveedor();

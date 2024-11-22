@@ -50,11 +50,10 @@ public class MockDataGenerator {
             producto.setMarcaProd("Marca_" + (random.nextInt(5) + 1));
             producto.setCategoriaProd(CatProducto.values()[random.nextInt(CatProducto.values().length)]);
             producto.setStock(random.nextInt(100) + 1);
-            //producto.setPrecioDeCompra(random.nextDouble() * 100 + 10);
-            producto.setPrecioDeCompra(11200300.4);
-            producto.setPrecioDeVenta(producto.getPrecioDeCompra() * 1.2);
-            producto.setFechaVen("2024-" + (random.nextInt(12) + 1) + "-" + (random.nextInt(28) + 1));
-            producto.setPorcentajeVenta(random.nextInt(100) + 1);
+            producto.setPrecioDeCompra(Math.round((random.nextDouble() * 10000+100) * 10) / 10.0);
+            producto.setPrecioDeVenta(Math.round(producto.getPrecioDeCompra() * 1.25 * 10)/ 10.0);
+            producto.setFechaVen((random.nextInt(28) + 1)+"/"+(random.nextInt(12) + 1) + "/2024");
+            producto.setPorcentajeVenta(25);
             producto.setProveedor(proveedores.get(random.nextInt(proveedores.size())));
 
             productos.add(producto);
@@ -112,8 +111,10 @@ public class MockDataGenerator {
             pedidoLinea.setProducto(productos.get(numeroRandomDeProducto));
             int cantidad = random.nextInt(productos.get(numeroRandomDeProducto).getStock()) + 1;
             pedidoLinea.setCantidad(cantidad);
-            pedidoLinea.setMontoIndividualCompra(productos.get(numeroRandomDeProducto).getPrecioDeCompra());
-            pedidoLinea.setMontoIndividualVenta(productos.get(numeroRandomDeProducto).getPrecioDeVenta());
+            Double montoIndividualDeCompra = productos.get(numeroRandomDeProducto).getPrecioDeCompra();
+            pedidoLinea.setMontoIndividualCompra((double) Math.round(montoIndividualDeCompra));
+            Double montoIndividualVenta = productos.get(numeroRandomDeProducto).getPrecioDeVenta();
+            pedidoLinea.setMontoIndividualVenta((double)Math.round(montoIndividualVenta));
             pedidoLineas.add(pedidoLinea);
         }
         return pedidoLineas;
@@ -167,7 +168,6 @@ public class MockDataGenerator {
             //inventario.actualizarStockPorPedidos(movimiento.getProductosComercializados());
             pedidosList.cambiarEstadoPedido(pedido);}
         }
-
         return movimientos;
     }
 }

@@ -29,6 +29,20 @@ public class Comercializar {
 
                 if (movimiento.mostrarMovimiento() == JOptionPane.YES_OPTION) {
 
+                    if(cuentaAModificar.getTipoCuenta() == TipoCuenta.DOLAR){
+                        int valorDolar;
+                        do {
+                            valorDolar = Mensajes.mensajesReturnINT("¿Cuánto está el dólar BLUE? (Debe ser mayor que 0)");
+                        } while (valorDolar <= 0);
+                        double nuevoMontoTotal = Math.round(movimiento.getMontoTotal()/valorDolar);
+                        movimiento.setMontoTotal(nuevoMontoTotal);
+                        double nuevoSaldoModificado = movimiento.getSaldoAnterior() + nuevoMontoTotal;
+                        movimiento.setSaldoModificado(nuevoSaldoModificado);
+                        Cuenta cuenta = movimiento.getCuenta();
+                        cuenta.setSaldo(nuevoSaldoModificado);
+                        movimiento.setCuenta(cuenta);
+                        Mensajes.mensajeOut("Monto total convertido: " + nuevoMontoTotal);
+                    }
                     // Crear un metodo que: IF CUENTA A MODIFICAR ES DOLAR
                     // (PREGUNTAR EL VALOR DEL BLUE)
                     //    Aplique SET al movimiento
@@ -39,7 +53,6 @@ public class Comercializar {
                     movimientos.add(movimiento); // lo cargo al listado de movimientos
                     cuentaAModificar = movimiento.getCuenta(); // trae la cuenta nueva con el nuevo saldo
                     cuentas.modificarCuentaPorCuenta(cuentaAModificar);// setea el nuevo saldo en el arreglo de cuentas
-
                     inventario.actualizarStockPorPedidos(movimiento.getProductosComercializados());
                     pedidosList.cambiarEstadoPedido(pedido);
 
@@ -210,9 +223,11 @@ public static void inicializarListas(Personas personas, Cuentas cuentas, Product
     productos.addProducto(producto);
 }
 
+// para transferencias de cuentas propias de CREDITO a -> (EFECTIVO O TRANSFERENCIA)
+// baja la deuda y aumenta el dinero ingresado
 public static void movimientoInterno(Double montoTotal, Cuenta cuentaOrigen,
                                      Cuenta cuentaDestino,
-                                     Cuentas cuentas, Movimientos movimientos, Productos productos){
+                                     Cuentas cuentas, Movimientos movimientos, Productos productos, Personas personas){
         if(cuentaOrigen.getTipoCuenta() != TipoCuenta.DOLAR && cuentaOrigen.getIdPersona() == cuentaDestino.getIdPersona()) {
             Producto producto = productos.buscarProducto("movimiento");
             PedidoLinea pedidoLinea = new PedidoLinea(producto, 0);
@@ -226,12 +241,14 @@ public static void movimientoInterno(Double montoTotal, Cuenta cuentaOrigen,
             movimientos.add(movimientoOrigen); //  lo cargo al listado de movimientos
             cuentaOrigen = movimientoOrigen.getCuenta(); // trae la cuenta nueva con el nuevo saldo
             cuentas.modificarCuentaPorCuenta(cuentaOrigen);// setea el nuevo saldo en el arre
+            modificarSaldoCuentaPropia(pedido.getTipoDePedido(),cuentaOrigen.getTipoCuenta(),movimientoOrigen.getMontoTotal(),cuentas,personas);
 
             pedido.setMontoTotal(montoTotal);
             Movimiento movimientoDestino = new Movimiento(TipoDeMovimiento.INTERNO, cuentaDestino, pedido, "Movimiento Destino", LocalDate.now());
             movimientos.add(movimientoOrigen); //  lo cargo al listado de movimientos
             cuentaDestino = movimientoDestino.getCuenta(); // trae la cuenta nueva con el nuevo saldo
             cuentas.modificarCuentaPorCuenta(cuentaDestino);// setea el nuevo saldo en el arre
+            modificarSaldoCuentaPropia(pedido.getTipoDePedido(),cuentaOrigen.getTipoCuenta(),movimientoOrigen.getMontoTotal(),cuentas,personas);
         }
     }
 
