@@ -49,6 +49,8 @@ public class Main {
         PedidosList pedidosList = new PedidosList(new ArrayList<>(pedidosArrayList));
         Movimientos movimientos = MockDataGenerator.generateMovimientos(500,productos,cuentas,pedidosList);
         // todo esto termina
+        //PedidosList pedidosList = new PedidosList();
+        //Movimientos movimientos = new Movimientos();
 
         System.out.println("termino de usar el moock ---------------------------------------");
 
@@ -75,8 +77,7 @@ public class Main {
         archivoUtil.escribirArchivo(productos.getProductos(), ";");
 
 
-        List<Producto> productoListas = new ArrayList<>();
-                productoListas = archivoUtil.leerArchivo(";");
+        List<Producto> productoListas  = archivoUtil.leerArchivo(";");
                 productoArrayList= new ArrayList<>(productoListas);
         archivoUtil.escribirArchivo(productoArrayList, ";");
 
@@ -112,111 +113,19 @@ public class Main {
 
         ArchivoUtil<Persona> archivoUtilPersona = new ArchivoUtil<>(archivoCSV, Persona.class);
         archivoUtilPersona.escribirArchivo(personas.getPersonas(), ";");
+
         //System.out.println("-------------------------- fin de escritura de persona------------------------------------");
 
-        //List<Persona> personasListas = new ArrayList<>();
-        //personasListas = archivoUtilPersona.leerArchivoPersonas(";");
-        //System.out.println("-------------------------- fin de lectura de persona------------------------------------");
-        //personaArrayList= new ArrayList<>(personasListas);
-        //archivoUtilPersona.escribirArchivo(personaArrayList, ";");
-
-        // fin de prueba de archivos
-/*
-        Domicilio domicilioModelo = new Domicilio("Jose Ingenieros",1765,0,'a');
-
-        Cliente clienteModelo = new Cliente("Agustin","Malagutti","30196270",domicilioModelo);
-        Proveedor proveedorModelo = new Proveedor("Agustin","Malagutti","30196271",domicilioModelo);
-        personaArrayList.add(clienteModelo);
-        personaArrayList.add(proveedorModelo);
-
-        Cuenta cuentaModeloProvD = new Cuenta(proveedorModelo,TipoCuenta.DOLAR);
-        Cuenta cuentaModeloProvP = new Cuenta(proveedorModelo,TipoCuenta.PESOS);
-        Cuenta cuentaModeloProvL = new Cuenta(proveedorModelo,TipoCuenta.LOQUEPINTE);
-        Cuenta cuentaModeloClieD = new Cuenta(clienteModelo,TipoCuenta.DOLAR);
-        Cuenta cuentaModeloClieP = new Cuenta(clienteModelo,TipoCuenta.PESOS);
-        Cuenta cuentaModeloClieL = new Cuenta(clienteModelo,TipoCuenta.LOQUEPINTE);
-
-        cuentaArrayList.add(cuentaModeloProvD);
-        cuentaArrayList.add(cuentaModeloProvP);
-        cuentaArrayList.add(cuentaModeloProvL);
-        cuentaArrayList.add(cuentaModeloClieD);
-        cuentaArrayList.add(cuentaModeloClieP);
-        cuentaArrayList.add(cuentaModeloClieL);
-
-        Producto productoModelo1 = new Producto("P1", "M1", CatProducto.CAT1,300,100.0,10,proveedorModelo);
-        Producto productoModelo2 = new Producto("P2", "M2", CatProducto.CAT1, 300, 100.0, 10, proveedorModelo);
-        Producto productoModelo3 = new Producto("P3", "M3", CatProducto.CAT1, 300, 100.0, 10, proveedorModelo);
-        Producto productoModelo4 = new Producto("P4", "M4", CatProducto.CAT1, 300, 100.0, 10, proveedorModelo);
-        Producto productoModelo5 = new Producto("P5", "M5", CatProducto.CAT1, 300, 100.0, 10, proveedorModelo);
-        Producto productoModelo6 = new Producto("P6", "M6", CatProducto.CAT1, 300, 100.0, 10, proveedorModelo);
-        productoArrayList.add(productoModelo1);
-        productoArrayList.add(productoModelo2);
-        productoArrayList.add(productoModelo3);
-        productoArrayList.add(productoModelo4);
-        productoArrayList.add(productoModelo5);
-        productoArrayList.add(productoModelo6);
-
-
-        //System.out.println(personaArrayList.get(1));
-        //System.out.println(cuentaArrayList.get(1));
-  */
-        System.out.println(cuentaArrayList.get(1).getPersona().getDni());
-        System.out.println(cuentaArrayList.get(1).getPersona().getTipoPersona());
-        System.out.println(cuentaArrayList.get(1).getTipoCuenta());
+        System.out.println(cuentaArrayList.get(12).getPersona().getDni());
+        System.out.println(cuentaArrayList.get(12).getPersona().getTipoPersona());
+        System.out.println(cuentaArrayList.get(12).getTipoCuenta());
         System.out.println(productoArrayList.get(1).getNombreProd());
 
-
-        //System.out.println(productoArrayList.get(0));
-        //System.out.println(productoArrayList.get(1));
-        //System.out.println(productoArrayList.get(2));
 
 
         Menu menu = new Menu(pedidosList,personas,cuentas,productos,movimientos);
         menu.mostrarMenuPrincipal();
-        entrada.close();
-/*
-        Scanner entrada = new Scanner(System.in);
 
-        Cliente generic = new Cliente();
-        generic = (Cliente) generic.crearPersona();
-        System.out.println(generic);
-
-        Personas personas = new Personas();
-        personas.addPersona(generic);
-        Cuenta cuenta = new Cuenta(generic, TipoCuenta.PESOS);
-        Cuentas cuentas= new Cuentas();
-        cuentas.add(cuenta);
-
-
-        //Producto genericproducto = Producto.cargarProducto(entrada);
-        //System.out.println(genericproducto);
-
-        //System.out.printf("Hello and welcome!");
-
-
-        Productos inventario = new Productos();
-
-        ArrayList<Movimiento> listaMovimientos = new ArrayList<>();
-        Movimientos movimientos= new Movimientos(listaMovimientos);
-        System.out.println("comienza el movimiento");
-        Comercializar.modificarProductoNuevo(entrada, inventario, cuentas, movimientos,TipoDeMovimiento.COMPRA);
-
-        for (Movimiento genericos : movimientos.getMovimientos()){
-            System.out.println("saldo anterior: "+genericos.getSaldoAnterior());
-            System.out.println("saldo modificado: "+genericos.getSaldoModificado());
-        }
-
-        for ( Producto genericos : inventario.getProductos()){
-            System.out.println(genericos);
-        }
-
-        for (Cuenta genericos : cuentas.getCuentas()){
-            System.out.println(genericos);
-        }
-
-        for (Persona genericos : personas.getPersonas()){
-            System.out.println(genericos);
-        }*/
 
     }
 }

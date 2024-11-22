@@ -9,6 +9,10 @@ public class Balance {
     private double debe;
     private double haber;
     private TipoCuenta tipoCuenta;
+    private String descripcion; //nuevo desde aca cargar en COMERCIALIZAR
+    private String Apellido;
+    private String NumeroDocumento;
+
 
     public Balance(LocalDate fecha, double debe, double haber, TipoCuenta tipoCuenta) {
         this.fecha = fecha;
