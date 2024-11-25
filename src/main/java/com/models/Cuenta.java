@@ -6,9 +6,10 @@ import com.models.funciones.Mensajes;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
-public class Cuenta {
+public class Cuenta implements Comparable<Cuenta> {
 
     private int id;
     private Persona persona;
@@ -93,7 +94,7 @@ public class Cuenta {
     }
 
     public int mostrarCuenta(){
-        int respuesta = Mensajes.mensajesReturnINT(
+        int respuesta = Mensajes.mensajeYesNO(
                 this.getActiva()+"\n"+
                         this.getPersona().getDni()+"\n"+
                         this.getPersona().getApellido()+"\n"+
@@ -106,8 +107,41 @@ public class Cuenta {
 
     @Override
     public String toString() {
-        return "Cuenta [id=" + id + ", idPersona=" + idPersona + ", saldo=" + saldo +
+        return "Cuenta [id=" + id +", persona="+persona+", idPersona=" + idPersona + ", saldo=" + saldo +
                 ", tipoCuenta=" + tipoCuenta + ", activa=" + activa + "]";
     }
+/*
+ private int id;
+    private Persona persona;
+    private int idPersona;
+    private Double saldo;
+    private TipoCuenta tipoCuenta;
+    private Boolean activa;
+ */
+@Override
+public int compareTo(Cuenta otraCuenta) { // para la prueba de velocidad
+    // Comparar por número de cuenta (puedes cambiarlo según la lógica deseada)
+    return Integer.compare(this.getId(), otraCuenta.getId());
+}
 
+    public boolean equals(Object obj) {
+        // Verifica si es la misma instancia
+        if (this == obj) {
+            return true;
+        }
+        // Verifica si el objeto es nulo o de otra clase
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        // Convierte el objeto al tipo Cuenta
+        Cuenta cuenta = (Cuenta) obj;
+
+        // Compara los atributos relevantes para igualdad
+        return id == cuenta.id &&
+                Objects.equals(persona, cuenta.persona) &&
+                idPersona == cuenta.idPersona &&
+                Objects.equals(saldo, cuenta.saldo) &&
+                tipoCuenta == cuenta.tipoCuenta &&
+                Objects.equals(activa, cuenta.activa);
+    }
 }

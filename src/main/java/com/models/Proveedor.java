@@ -2,6 +2,8 @@ package com.models;
 
 import com.enums.TipoPersona;
 import com.enums.TipoProveedor;
+import com.models.funciones.Mensajes;
+import com.validaciones.Validaciones;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -55,7 +57,19 @@ public class Proveedor extends Persona {
         Domicilio domicilio= new Domicilio();
         generic.setNombre(JOptionPane.showInputDialog("Ingrese el nombre:"));
         generic.setApellido(JOptionPane.showInputDialog("Ingrese el apellido:"));
-        generic.setDni(JOptionPane.showInputDialog("Ingrese el DNI:"));
+        String DNI;
+        do {
+            DNI = Mensajes.mensajeReturnString("Ingrese el DNI:");
+
+            if (DNI == null || !Validaciones.validarDNI(DNI)) {
+                JOptionPane.showMessageDialog(null,
+                        "El DNI ingresado es inválido o se canceló. Por favor, inténtelo nuevamente.",
+                        "Entrada inválida",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } while (DNI == null || !Validaciones.validarDNI(DNI));
+
+        generic.setDni(DNI);
         generic.setEmail(JOptionPane.showInputDialog("Ingrese el email:"));
 
         // Cargar y establecer el domicilio usando JOptionPane
@@ -64,16 +78,29 @@ public class Proveedor extends Persona {
 
         // Establecer el estado activo
         generic.setActive(true);
+        generic.setTipoPersona(TipoPersona.PROVEEDOR);
         return generic;
     }
 
 
     public Proveedor crearProveedor() {
         Proveedor generic = new Proveedor();
-        Domicilio domicilio;
+        Domicilio domicilio= new Domicilio();
         generic.setNombre(JOptionPane.showInputDialog("Ingrese el nombre:"));
         generic.setApellido(JOptionPane.showInputDialog("Ingrese el apellido:"));
-        generic.setDni(JOptionPane.showInputDialog("Ingrese el DNI:"));
+        String DNI;
+        do {
+            DNI = Mensajes.mensajeReturnString("Ingrese el DNI:");
+
+            if (DNI == null || !Validaciones.validarDNI(DNI)) {
+                JOptionPane.showMessageDialog(null,
+                        "El DNI ingresado es inválido o se canceló. Por favor, inténtelo nuevamente.",
+                        "Entrada inválida",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } while (DNI == null || !Validaciones.validarDNI(DNI));
+
+        generic.setDni(DNI);
         generic.setEmail(JOptionPane.showInputDialog("Ingrese el email:"));
 
         // Cargar y establecer el domicilio usando JOptionPane
@@ -82,7 +109,9 @@ public class Proveedor extends Persona {
 
         // Establecer el estado activo
         generic.setActive(true);
+        generic.setTipoPersona(TipoPersona.PROVEEDOR);
         return generic;
+
     }
 
     public int mostrarProveedor() {

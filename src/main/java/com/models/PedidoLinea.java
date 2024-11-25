@@ -80,7 +80,7 @@ public class PedidoLinea {
                 this.producto.getMarcaProd(),
                 this.producto.getNombreProd(),
                 this.getCantidad(),
-                this.getMontoIndividualCompra(),
+                this.getMontoIndividualVenta(),
                 this.getCantidad() * this.getMontoIndividualVenta() // Calcular el subtotal
         };
     }

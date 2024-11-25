@@ -1,5 +1,7 @@
 package com.models;
 
+import com.models.funciones.Mensajes;
+
 import javax.swing.*;
 import java.util.Objects;
 import java.util.Scanner;
@@ -68,34 +70,22 @@ public class Domicilio {
     public static Domicilio cargarDomicilio(){
         Domicilio domicilio = new Domicilio();
         // Pedir la calle
-        domicilio.setCalle(JOptionPane.showInputDialog("Ingrese la calle:"));
+        domicilio.setCalle(Mensajes.mensajeReturnString("Ingrese la calle:"));// TODO: Solo verificar que sea tipo String
 
-        // Pedir la altura, asegurándonos de convertir el String a int
-        String alturaStr = JOptionPane.showInputDialog("Ingrese la altura:");
-        int altura = Integer.parseInt(alturaStr); // Convertir el String a int
+
+        int altura =  Mensajes.mensajesReturnINT("Ingrese la altura:"); // TODO: Solo verificar que sea tipo INT
         domicilio.setAltura(altura);
 
         // piso y depto
-        String pisoStr = JOptionPane.showInputDialog("Ingrese el piso:");
-        int piso = Integer.parseInt(pisoStr);
+        int piso = Mensajes.mensajesReturnINT("Ingrese el piso:"); // TODO: Solo verificar que sea tipo INT
         domicilio.setPiso(piso);
 
-        String deptoStr = JOptionPane.showInputDialog("Ingrese el departamento:");
-        char depto = deptoStr.charAt(0);
+
+        char depto = Mensajes.mensajesReturnChar("Ingrese el departamento:"); // TODO: Solo verificar que sea tipo CHAR
         domicilio.setDepto(depto);
 
-        JOptionPane.showMessageDialog(null, "Fin de domicilio"); // Mostrar mensaje de fin
+        Mensajes.mensajeOut( "Fin de domicilio");
 
-        /* System.out.println("ingrese el Domicilio");
-        System.out.println("ingrese la calle");
-        domicilio.setCalle(entrada.nextLine());
-        System.out.println("ingrese la Altura");
-        entrada.nextInt();
-        domicilio.setAltura(entrada.nextInt());
-        System.out.println("fin de docimilio");//System.out.println("ingrese el Piso");
-        //domicilio.setPiso(entrada.nextInt());
-        //System.out.println("ingrese el depto");
-        //domicilio.setDepto(entrada.nextLine().charAt(0));*/
     return domicilio;
     }
 

@@ -104,7 +104,11 @@ public class Movimiento {
     }
 
     public int mostrarMovimiento(){
-        return Mensajes.mensajeYesNO(this.descripcion);
+        return Mensajes.mensajeYesNO(
+                  this.getId()+"\n"
+                        +this.getCuenta().getPersona().getApellido()+"\n"
+                        +this.getMontoTotal()+"\n"
+                        +this.getDescripcion());
     }
 
     public Movimiento invertirMovimiento() {

@@ -62,6 +62,47 @@ public class MockDataGenerator {
         return productos;
     }
 
+    private String nombresPersonas(){
+        String[] nombres = {
+                "Juan", "María", "Carlos", "Sofía", "Luis", "Ana", "Miguel", "Carmen",
+                "Jorge", "Lucía", "Pedro", "Valentina", "Diego", "Laura", "Roberto",
+                "Isabel", "Fernando", "Paula", "Alberto", "Natalia", "Gabriel", "Andrea",
+                "Javier", "Martina", "Manuel", "Elena", "Ricardo", "Clara", "David",
+                "Victoria", "Andrés", "Sara", "Enrique", "Julia", "Pablo", "Mariana",
+                "Santiago", "Verónica", "Antonio", "Rocío", "Francisco", "Patricia",
+                "Daniel", "Emilia", "Adrián", "Florencia", "Hugo", "Alejandra", "Tomás",
+                "Gabriela"
+        };
+
+        // Elegir un índice aleatorio
+        int indiceAleatorio = (int) (Math.random() * nombres.length);
+
+        // Devolver el nombre aleatorio
+        return nombres[indiceAleatorio];
+    }
+
+
+    private String apellidosPersonas() {
+        String[] apellidos = {
+                "González", "Rodríguez", "López", "Martínez", "Hernández", "Pérez", "Gómez", "Sánchez",
+                "Díaz", "Alvarez", "Torres", "Romero", "Ramírez", "Flores", "Cruz", "Morales",
+                "Ortiz", "Delgado", "Castro", "Ramos", "Guerrero", "Vargas", "Medina", "Cortez",
+                "Mendoza", "Silva", "Reyes", "Fernández", "Rivas", "García", "Velázquez", "Álvarez",
+                "Chávez", "Fuentes", "Navarro", "Paredes", "Herrera", "Aguilar", "Ibarra", "Salinas",
+                "Cabrera", "Acosta", "Montoya", "Vega", "Campos", "Santana", "Valdez", "Peña", "Luna", "Esquivel"
+        };
+
+        int indiceAleatorio = (int) (Math.random() * apellidos.length);
+        return apellidos[indiceAleatorio];
+    }
+
+    private String productosNombres() {
+        String[] productos = {"YERBA AGROECOLOGICA CON PALO", "YERBA AGROECOLOGICA SIN PALO", "YERBA BOLSON GRANEL CON PALO", "YERBA BOLSON GRANEL SIN PALO", "TE VERDE ORGANICO GRANEL", "TE ROJO ORGANICO GRANEL", "TE NEGRO ORGANICO GRANEL", "TE VERDE SAQUITO", "TE ROJO SAQUITO", "TE MIX HIERBAS SAQUITO", "TE MANZANILLA SAQUITO", "TE BOLDO SAQUITO", "BARRA PROTEICA VAINILLA Y MACA PERUANA", "BARRA PROTEICA COCO NATURAL", "BARRA PROTEICA MANZANA Y ALGARROBA", "BARRA PROTEICA CACAO ESPAÑOL", "BARRA PROTEICA CAFÉ CON LECHE DE COCO", "BARRA DE CACAO Y AVELLANAS X 45GR", "BARRA DE MANZANA Y ARANDANO X 45GR", "BARRA DE PASAS DE UVA Y ALMENDRAS X 45GR", "BARRA DE PASAS DE UVA Y ARANDANOS  X 45GR", "BARRA DE BANANA Y DULCE DE LECHE X 45GR", "BARRA PROTEICA VEGANA X 70GR PONT", "ALFAJOR VEGANO CACAO, DDL DE COCO Y PASTA DE MANÍ X 60GR", "CHOCOLATE VEGANO 71% CACAO, ALMENDRAS Y SAL MARINA X 80GR", "CHOCOLATE 55% CACAO CON ALMENDRAS", "CHOCOLATE 80% CACAO", "CHOCOLATE 100% CACAO SIN AZUCAR", "BOMBON DE NUEZ CON DDL Y CHOCOLATE", "BOMBON DE NUEZ CON DDL Y CHOCOLATE", "ALMENDRA NON PAREIL 25/27", "NUEZ MARIPOSA EXTRA LIGHT", "CASTAÑA DE CAJU W4", "PISTACHO C/ CASCARA", "MIX SECO TRADICIONAL", "BARBACOA SIN TACC", "BRAVA SIN TACC", "PIMIENTA TABASCO SIN TACC", "PASAS DE UVA JUMBO", "PERA WILLIAMS GRANDE", "DURAZNO EN MITADES", "CIRUELA D´AGEN S/C (BOMBON)", "CIRUELA PRESIDENTE S/C", "DATIL CON CAROZO EGIPTO", "DATIL MEDJOOL ISRAEL CON CAROZO", "AMARGON (DIENTE DE LEON)", "MANZANILLA EN FLORES DE EGIPTO", "MENTA PIPERITA (FUERTE)", "AVENA INSTANTANEA 3 ARROYOS", "AVENA TRADICIONAL 3 ARROYOS", "AVENA GRUESA 3 ARROYOS", "ARROZ CARNAROLI GRANEL", "ARROZ BASMATI INDIA CROWN-BOLSA 5KG", "HARINA DE ALMENDRA CON PIEL", "HARINA DE ALMENDRA SIN PIEL", "HARINA DE MAIZ. PAN", "HARINA DE MAIZ. MORIXE", "HARINA DE MAIZ. COSACO", "COUS COUS", "CASCARILLA DE CACAO GRUESA", "CACAO ALCALINO. MARCA CIVEN. ORIGEN VENEZUELA.", "AZUCAR MASCABO BA-LA-JU", "AZUCAR MASCABO BA-LA-JU", "COCO RALLADO HIGH FAT", "POROTO PYTAI", "POROTO SOJA", "POROTO ALUBIA", "PANKO TASSYA", "TAHINI. AL KANATER ORIGEN LIBANO. SIN TACC", "SAL ROSADA FINA DEL HIMALAYA", "ALGAS P/SUSHI YAKI NORI", "MAPLE SYRUP. BERNARD", "SIROPE DE DATIL. LYNA S/TACC", "KALLPA. MACA NEGRA", "KALLPA. MACA"};
+        int indiceAleatorio = (int) (Math.random() * productos.length);
+        return productos[indiceAleatorio];
+    }
+
+
     public static List<Persona> generarPersonas2(int cantidad) {
         List<Persona> personas = new ArrayList<>();
         Random random = new Random();
@@ -151,23 +192,38 @@ public class MockDataGenerator {
     // ***********************************************************************
 
 
-    public static Movimientos generateMovimientos(int numeroDeMovimientos, Productos inventario,
+    public static Movimientos generateMovimientos(int numeroDeMovimientos, Productos inventario,// no modifica stock
                                                   Cuentas cuentas,
-                                                  PedidosList pedidosList) {
-
-        Movimientos movimientos = new Movimientos();
+                                                  PedidosList pedidosList, Balances balances) {
+        Movimientos movimientos = new Movimientos("mock");// para que no reescriba el archivo y genere un movimiento temporal
         for (int i = 0; i < numeroDeMovimientos; i++) {
             Pedido pedido = pedidosList.getPedido(random.nextInt(pedidosList.getPedidosList().size()));
             if(pedido.getIdCuenta()>10){// cuentas usuario root
             Cuenta cuentaAModificar = cuentas.buscarCuentaPorId(pedido.getIdCuenta());
             Movimiento movimiento = new Movimiento(pedido.getTipoDePedido(), cuentaAModificar,
                     pedido, "mock", LocalDate.now());
-            movimientos.add(movimiento); // lo cargo al listado de movimientos
+            movimientos.addMock(movimiento); // lo cargo al listado de movimientos
             cuentaAModificar = movimiento.getCuenta(); // trae la cuenta nueva con el nuevo saldo
-            cuentas.modificarCuentaPorCuenta(cuentaAModificar);// setea el nuevo saldo en el arreglo de cuentas
+            cuentas.modificarCuentaPorCuentaMock(cuentaAModificar);// setea el nuevo saldo en el arreglo de cuentas
             //inventario.actualizarStockPorPedidos(movimiento.getProductosComercializados());
-            pedidosList.cambiarEstadoPedido(pedido);}
+            pedidosList.cambiarEstadoPedidoMock(pedido);
+
+                if(pedido.getTipoDePedido()==TipoDeMovimiento.VENTA) {
+                    Balance balance = new Balance(LocalDate.now(), movimiento.getMontoTotal(), 0.0, cuentaAModificar.getTipoCuenta());
+                    balances.addMock(balance);
+                }
+                if(pedido.getTipoDePedido()==TipoDeMovimiento.COMPRA) {
+                    Balance balance = new Balance(LocalDate.now(), 0.0, movimiento.getMontoTotal(),cuentaAModificar.getTipoCuenta());
+                    balances.addMock(balance);
+                }
+
+            }
+
         }
+        cuentas.persistenciaEscribirMock();
+        pedidosList.persistenciaEscribirMock();
+        balances.persistenciaEscribirMock();
+
         return movimientos;
     }
 }

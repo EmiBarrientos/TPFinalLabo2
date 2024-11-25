@@ -3,6 +3,7 @@ package com.models;
 import com.enums.TipoCuenta;
 import com.models.funciones.Listas;
 import com.models.funciones.Movimiento;
+import org.example.ArchivoUtil;
 
 
 import java.util.ArrayList;
@@ -11,28 +12,50 @@ import java.util.Objects;
 
 public class Cuentas {
     private List<Cuenta> cuentas;
+    private static final String archivo = "cuentas.csv";
 
     public Cuentas(List<Cuenta> cuentas) {
         this.cuentas = cuentas;
     }
 
     public Cuentas() {
-        cuentas = new ArrayList<>();
-        this.cuentas = cuentas;
+        this.cuentas = new ArrayList<>();
+        List<Cuenta> cuentasListas = persistenciaLeer();
+        if(cuentasListas != null){
+        cuentas= new ArrayList<>(cuentasListas);}
     }
 
     public List<Cuenta> getCuentas() {
         return cuentas;
     }
 
+    private List<Cuenta> persistenciaLeer(){
+        ArchivoUtil.crearArchivo(archivo);
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Cuenta.class);
+        return archivoUtil.leerArchivo(";");
+    }
+
+    private void persistenciaEscribir(){
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Cuenta.class);
+        archivoUtil.escribirArchivo(this.cuentas,";");
+    }
+
+    public void persistenciaEscribirMock(){ //que solo se use en el mock
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Cuenta.class);
+        archivoUtil.escribirArchivo(this.cuentas,";");
+    }
+
     private void add(Cuenta cuenta){
         int nuevoId= this.maxId()+1;
         cuenta.setId(nuevoId);
         this.cuentas.add(cuenta);
+        this.persistenciaEscribir();
     }
+
 
     public void addAll(List <Cuenta> listaAgregar){
     this.cuentas.addAll(listaAgregar);
+        this.persistenciaEscribir();
     }
 
     public Cuenta buscarCuentaPorId(int idCuenta) {
@@ -46,17 +69,33 @@ public class Cuentas {
         for (Cuenta generic : this.cuentas){
             if (generic.getPersona().getId() == persona.getId() &&
                     generic.getTipoCuenta() == tipo
-            ){return generic;}
+            )
+            {return generic;}
         }
         return null;
     }
+
+
+    public int modificarCuentaPorCuentaMock(Cuenta cuenta){
+        int index=0;
+        for (Cuenta generic : this.cuentas){
+            if (generic.getId()== cuenta.getId()){
+                this.cuentas.set(index,cuenta);
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
 
     public int modificarCuentaPorCuenta(Cuenta cuenta){
         int index=0;
         for (Cuenta generic : this.cuentas){
             if (generic.getId()== cuenta.getId()){
                 this.cuentas.set(index,cuenta);
-                return 0;
+                this.persistenciaEscribir();
+                return index;
             }
             index++;
         }
@@ -70,7 +109,7 @@ public class Cuentas {
         linea.setCampo2("Tipo");
         linea.setCampo3("Numero Titular");
         linea.setCampo4("Apellido");
-        linea.setCampo4("Estado de Cuenta");
+        linea.setCampo5("Estado de Cuenta");
         informe.add(linea);
         linea = new Listas();
         for (Cuenta generic : this.cuentas) {
@@ -102,6 +141,7 @@ public class Cuentas {
             this.cuentas.add(generic);
             i++;
         }
+        this.persistenciaEscribir();
     }
 
     public void cargarCuentasNuevaPersonaClienteROOT(Persona p){
@@ -113,6 +153,7 @@ public class Cuentas {
             this.cuentas.add(generic);
             i++;
         }
+        this.persistenciaEscribir();
     }
 
     //lo utiliza en el menu
@@ -121,6 +162,7 @@ public class Cuentas {
         for ( Cuenta generic : cuentasNuevas ){
             this.add(generic);
         }
+        this.persistenciaEscribir();
     }
     public int maxId(){
         int maxId=0;
@@ -131,4 +173,34 @@ public class Cuentas {
         }
         return maxId;
     }
+
+    public int altaCuenta(Cuenta cuenta){
+        int index=0;
+        for (Cuenta generic : this.cuentas){
+            if (generic.getId()== cuenta.getId()){
+                generic.setActiva(true);
+                this.cuentas.set(index,generic);
+                this.persistenciaEscribir();
+                return 0;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    public int bajaCuenta(Cuenta cuenta){
+        int index=0;
+        for (Cuenta generic : this.cuentas){
+            if (generic.getId()== cuenta.getId()){
+                generic.setActiva(false);
+                this.cuentas.set(index,generic);
+                this.persistenciaEscribir();
+                return 0;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+
 }

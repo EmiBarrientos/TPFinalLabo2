@@ -15,13 +15,12 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class Menu {
-    private Scanner entrada = new Scanner(System.in);
-    private Personas personas = new Personas();
-    private Cuentas cuentas = new Cuentas();
-    private Productos productos = new Productos();
-    private Movimientos movimientos = new Movimientos();
+    private Personas personas;
+    private Cuentas cuentas;
+    private Productos productos;
+    private Movimientos movimientos;
     private PedidosList pedidosList;
-    private Balances balances= new Balances();
+    private Balances balances;
 
     private Cliente clienteGenerica=new Cliente();
     private Proveedor proveedorGenerico= new Proveedor();
@@ -39,13 +38,14 @@ public class Menu {
     private String DNIgenerico="";
 
 
-    public Menu(PedidosList pedidosList, Personas personas, Cuentas cuentas, Productos productos, Movimientos movimientos) {
+    public Menu(PedidosList pedidosList, Personas personas, Cuentas cuentas, Productos productos, Movimientos movimientos, Balances balances) {
 
         this.personas = personas;
         this.cuentas = cuentas;
         this.productos = productos;
         this.movimientos = movimientos;
         this.pedidosList = pedidosList;
+        this.balances = balances;
     }
 
     public void mostrarMenuPrincipal() {
@@ -83,7 +83,7 @@ public class Menu {
 
     private void altaCliente() {
         this.DNIgenerico = Mensajes.mensajeReturnString("Ingrese el DNI del cliente:");
-        int index = this.personas.buscarIndexPorDNI(DNIgenerico);
+        int index = this.personas.buscarIndexPorDNI(DNIgenerico); // TODO: Solo verificar que sea tipo String
         if(index == -1) {
             // ------------------- opcion cliente no esta (-1) ---------------
             clienteGenerica = new Cliente();
@@ -133,7 +133,7 @@ public class Menu {
 
     private void bajaPersona() {
             DNIgenerico = Mensajes.mensajeReturnString("Ingrese el DNI del cliente a dar de baja:");
-            int index = this.personas.buscarIndexPorDNI(DNIgenerico);
+            int index = this.personas.buscarIndexPorDNI(DNIgenerico); // TODO: Solo verificar que sea tipo String
             if (index != -1) { // index >-1
             if (Mensajes.mensajeYesNO("¿Confirma la baja del cliente?") == JOptionPane.YES_OPTION) {
             this.personas.darBajaPersona(index);
@@ -147,8 +147,8 @@ public class Menu {
             DNIgenerico = "";
     }
         private void modificarCliente() {
-            DNIgenerico = Mensajes.mensajeReturnString("Ingrese el DNI del cliente a modificar:");
-            indexGenerico = this.personas.buscarIndexPorDNI(DNIgenerico);
+            DNIgenerico = Mensajes.mensajeReturnString("Ingrese el DNI del cliente a modificar:"); // TODO: Solo verificar que sea tipo String
+            indexGenerico = this.personas.buscarIndexPorDNI(DNIgenerico); // TODO: Solo verificar que sea tipo String
             if (indexGenerico == -1) {
                 // cliente no encontrado (null)
                 Mensajes.mensajeOut("Cliente no encontrado.");
@@ -157,10 +157,9 @@ public class Menu {
             else {// cliente encontrado (no -1)
                 Mensajes.mensajeOut("Persona encontrada:");
                 tipoPersona = personas.buscarPersonaPorIndex(indexGenerico).getTipoPersona();
-                System.out.println(tipoPersona);
                 if (tipoPersona == TipoPersona.CLIENTE){
                     clienteGenerica = (Cliente) personas.buscarPersonaPorIndex(indexGenerico);
-                    clienteGenerica = Cliente.modificarCliente(clienteGenerica);
+                    clienteGenerica = Cliente.modificarCliente(clienteGenerica); // TODO: Solo verificar que sea tipo String
                     if (Mensajes.mensajeYesNO("¿Confirma la modificación?") == JOptionPane.YES_OPTION) {
                         personas.setPersonas(indexGenerico,clienteGenerica);
                         Mensajes.mensajeOut("Modifcado con Exito");}
@@ -179,7 +178,7 @@ public class Menu {
 
 
     private void buscarPersona() {
-        personas.buscarPersonaConMensajito();
+        personas.buscarPersonaConMensajito(); // TODO: Solo verificar que Mensajaes
     }
 
 // ----------------proveedores
@@ -259,7 +258,6 @@ public class Menu {
         else {// cliente encontrado (no -1)
             Mensajes.mensajeOut("Persona encontrada:");
             tipoPersona = personas.buscarPersonaPorIndex(indexGenerico).getTipoPersona();
-            System.out.println(tipoPersona);
             if (tipoPersona == TipoPersona.PROVEEDOR){
                 proveedorGenerico = (Proveedor) personas.buscarPersonaPorIndex(indexGenerico);
                 proveedorGenerico = Proveedor.modificarProveedor(proveedorGenerico);
@@ -309,30 +307,31 @@ public class Menu {
     }
 
     private void anularMovimiento() {
-        Comercializar.anularMovimientoMenus(movimientos, cuentas, productos, personas);
+        Comercializar.anularMovimientoMenus(movimientos, cuentas, productos, personas, balances); // TODO: Solo verificar que Mensajaes
         if (Mensajes.mensajeYesNO("¿Quiere anular otro Movimiento?") == JOptionPane.YES_OPTION) {
             anularMovimiento();
         }
     }
 
     private void buscarUnMovimiento() {
-        Comercializar.buscarMovimiento(movimientos,cuentas, productos,personas);
+        Comercializar.buscarMovimiento(movimientos,cuentas, productos,personas); // TODO: Solo verificar que Mensajaes
         if (Mensajes.mensajeYesNO("¿Quiere buscar otro Movimiento?") == JOptionPane.YES_OPTION) {
             buscarUnMovimiento();
     }
             }
+            private void crearPedido() {
 
-    private void crearPedido() {
-
-        cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas);
+        cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas); // TODO: Solo verificar que Mensajaes
         if (cuentaGenerico == null) {
             Mensajes.mensajeOut("No existe cuenta con esos requisitos");
         }
         if (cuentaGenerico != null) {
             tipoDeMovimiento = Mensajes.mensajeReturnEnumConOpciones(TipoDeMovimiento.class, "Tipo de Movimiento");
-            pedidoGenerico = Comercializar.crearPedidoConDatosValidos(pedidosList, productos, tipoDeMovimiento, cuentaGenerico);
+            pedidoGenerico = Comercializar.crearPedidoConDatosValidos(pedidosList, productos,
+                    tipoDeMovimiento, cuentaGenerico); // TODO: Solo verificar que Mensajaes
 
-            Comercializar.aplicarMovimiento(productos, cuentas, movimientos, pedidoGenerico, pedidosList,balances, personas);
+            Comercializar.aplicarMovimiento(productos, cuentas, movimientos, pedidoGenerico,
+                    pedidosList,balances, personas);
             cuentaGenerico = new Cuenta();
             DNIgenerico = "";
             pedidoGenerico = new Pedido();
@@ -348,7 +347,7 @@ public class Menu {
         String[] opcion ={"Buscar y eliminar un Pedido", "Eliminar todos los Pedidos Pendientes"};
         int eleccion = Mensajes.mensajeReturnIntConOpciones(opcion,"Elija una opcion");
         if (eleccion == 0 ){
-            cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas);
+            cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas); // TODO: Solo verificar que Mensajaes
             pedidosList.eliminarPedidoPendiente(cuentaGenerico.getId());
         }
         if (eleccion==1){
@@ -361,7 +360,7 @@ public class Menu {
     }
 
     private int buscarPedidos() {
-        cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas);
+        cuentaGenerico = Comercializar.buscarCuenta(personas, cuentas); // TODO: Solo verificar que Mensajaes
         boolean estado = (Mensajes.mensajeYesNO("Buscar los que estan pendientes?")==JOptionPane.YES_OPTION);
         int index = pedidosList.buscarPedido(cuentaGenerico.getId(),estado);
         if (Mensajes.mensajeYesNO("¿Quiere buscar más pedidos?") == JOptionPane.YES_OPTION) {
@@ -370,11 +369,15 @@ public class Menu {
         }
         return index;
     }
-    private void ejecutarPedido() {
-        cuentaGenerico = Comercializar.buscarCuenta(personas,cuentas);
+
+    private void ejecutarPedido() { // TODO: MENU MODIFICADO OJO 24/11
+        cuentaGenerico = Comercializar.buscarCuenta(personas,cuentas); // TODO: Solo verificar que Mensajaes
         int index = pedidosList.buscarPedido(cuentaGenerico.getId(),false);
-        pedidoGenerico = pedidosList.getPedido(index) ;
-        Comercializar.aplicarMovimiento(productos,cuentas,movimientos,pedidoGenerico,pedidosList,balances,personas);
+        if(index>-1) {
+            pedidoGenerico = pedidosList.getPedido(index);
+            Comercializar.aplicarMovimiento(productos,cuentas,movimientos,pedidoGenerico,pedidosList,balances,personas);
+        }
+        else{Mensajes.mensajeOut("No hay pendientes con ese numero");}
         if (Mensajes.mensajeYesNO("\"¿Quiere ejecutar más pedidos?\"") == JOptionPane.YES_OPTION) {
             ejecutarPedido();
         }
@@ -444,11 +447,11 @@ public class Menu {
         }
     }
 
-    private Cuenta verSaldoCuentaPersonas() {
+    private Cuenta verSaldoCuentaPersonas() { // TODO: MODIFIQUE MENU
 
         Cuenta respuesta=null;
-        cuentaGenerico = Comercializar.buscarCuenta(personas,cuentas);
-        if(cuentaGenerico.mostrarCuenta()==JOptionPane.YES_OPTION){
+        cuentaGenerico = Comercializar.buscarCuenta(personas,cuentas); // TODO: Solo verificar que Mensajaes
+        if(cuentaGenerico !=null && cuentaGenerico.mostrarCuenta()==JOptionPane.YES_OPTION){ // TODO: MODIFIQUE MENU
             respuesta = cuentaGenerico;
         }
         if (Mensajes.mensajeYesNO("¿Quiere ver el saldo de otra Persona?") == JOptionPane.YES_OPTION) {
@@ -536,7 +539,7 @@ public class Menu {
     }
 
     private void buscarPorProducto() {
-        productos.buscarProductoNombre(Mensajes.mensajeReturnString("Escribir el Nombre del Producto a Comprar"));
+        productos.buscarProductoNombre(Mensajes.mensajeReturnString("Escribir el Nombre del Producto a Comprar")); // TODO: Solo verificar que Mensajaes
     }
 
 }

@@ -1,5 +1,7 @@
 package com.models;
 import com.enums.CatProducto;
+
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -20,7 +22,7 @@ public class Producto implements Comparable<com.models.Producto> {
     private double precioDeCompra;
     private double precioDeVenta;
     private String FechaVen; // esto deberia ser un PAR List<FechaVenc,Activo> cada vez que se compra se
-                             // debe verificar si no esta se agrega y se carga activo, si esta se activa
+                            // debe verificar si no esta se agrega y se carga activo, si esta se activa
                              // y cuando se agota un lote una metodo para desactivar  esa fecha de vencimiento
     private int porcentajeVenta;
     private Proveedor proveedor; // OJO QUE ESTE LO AGREGUE AHORA
@@ -129,9 +131,9 @@ public class Producto implements Comparable<com.models.Producto> {
     }
 
     public Producto setFechaVen(String fechaVen) {
-        if(Validaciones.validarFecha(fechaVen)){
+        //if(Validaciones.validarFecha(fechaVen)){ lo pasamos a Mensajes
             FechaVen = fechaVen;
-        }
+        //}
         return this;
     }
 
@@ -163,21 +165,20 @@ public class Producto implements Comparable<com.models.Producto> {
     // los mismos atributos asi no se duplica (se necesita un metodo en productos)
 
 
-    public static Producto cargarProducto(){
+    public static Producto cargarProducto(){ // TODO: Solo verificar que Mensajaes
         Producto producto= new Producto();
         producto.setMarcaProd(Mensajes.mensajeReturnString("Ingrese la marca del producto:"));
         producto.setNombreProd(Mensajes.mensajeReturnString("Ingrese el nombre del producto:"));
         CatProducto categoria = Mensajes.mensajeReturnEnumConOpciones(CatProducto.class,"Elija una Categoria");
         producto.setCategoriaProd(categoria);
 
-        String precDeCompraStr = Mensajes.mensajeReturnString("Ingrese el precio de compra:");
-        double precDeCompra = Double.parseDouble(precDeCompraStr); // Convertir a double
-        String porcentajeVentaStr = Mensajes.mensajeReturnString("Ingrese el porcentaje de ganancia:");
-        int porcentajeVenta = Integer.parseInt(porcentajeVentaStr); // Convertir a int
+        double precDeCompra = Mensajes.mensajeReturnDouble("Ingrese el precio de compra:");
+        int porcentajeVenta = Mensajes.mensajesReturnINT("Ingrese el porcentaje de ganancia:");
         producto.setPorcentajeVenta(porcentajeVenta);
         producto.updatePrecio(precDeCompra); // actualiza el precio de venta
 
-        producto.setFechaVen(Mensajes.mensajeReturnString("Ingrese la fecha de vencimiento (ej. 31/12/2024):"));
+        String fecha = String.valueOf(Mensajes.mensajeFecha("Ingrese la fecha de vencimiento (ej. 31/12/2024):"));
+        producto.setFechaVen(fecha);
         return producto;
     }
 
@@ -255,7 +256,21 @@ public class Producto implements Comparable<com.models.Producto> {
     public String toString() {
         return "Producto [idProd=" + idProd + ", nombre=" + nombreProd + ", marca=" + marcaProd +
                 ", categoria=" + categoriaProd + ", stock=" + Stock + ", precioCompra=" + precioDeCompra +
-                ", precioVenta=" + precioDeVenta + ", proveedor=" + proveedor + "]";
+                ", precioVenta=" + precioDeVenta + ", FechaVen="+ FechaVen +", porcentajeVenta="+porcentajeVenta+", proveedor=" + proveedor + "]";
     }
+    /*
+        private int idProd;
+    private String nombreProd;
+    private String marcaProd;
+    private CatProducto categoriaProd;
+    private int Stock;
+    private double precioDeCompra;
+    private double precioDeVenta;
+    private String FechaVen; // esto deberia ser un PAR List<FechaVenc,Activo> cada vez que se compra se
+                            // debe verificar si no esta se agrega y se carga activo, si esta se activa
+                             // y cuando se agota un lote una metodo para desactivar  esa fecha de vencimiento
+    private int porcentajeVenta;
+    private Proveedor proveedor; // OJO QUE ESTE LO AGREGUE AHORA
 
+     */
 }

@@ -2,6 +2,8 @@ package com.models.funciones;
 
 import com.models.Cuenta;
 import com.models.Persona;
+import com.models.Producto;
+import org.example.ArchivoUtil;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -10,10 +12,43 @@ import java.util.List;
 
 public class Movimientos {
     private List<Movimiento> movimientos;
+    private static final String archivo = "movimientos.csv";
 
     public Movimientos() {
         this.movimientos=new ArrayList<>();
+        List<Movimiento> listas = persistenciaLeer();
+        if(listas != null){
+            if(listas.isEmpty()==true){
+                System.out.println("no null pero vacia");
+            }
+            System.out.println("no null y no vacia");
+            movimientos= new ArrayList<>(listas);}
+        else{
+            System.out.println("null");
+        }
     }
+
+    public Movimientos(String mock) {
+        this.movimientos=new ArrayList<>();
+    }
+
+
+    private List<Movimiento> persistenciaLeer(){
+        ArchivoUtil.crearArchivo(archivo);
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Movimiento.class);
+        return archivoUtil.leerArchivo(";");
+    }
+
+    private void persistenciaEscribir(){
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Cuenta.class);
+        archivoUtil.escribirArchivoMov(this.movimientos,";");
+    }
+
+    public void persistenciaEscribirMock(){// solo para el mock
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Cuenta.class);
+        archivoUtil.escribirArchivoMov(this.movimientos,";");
+    }
+
 
     public Movimientos(List<Movimiento> movimientos) {
         this.movimientos = movimientos;
@@ -37,10 +72,26 @@ public class Movimientos {
         return maxId;
     }
 
+    public void addMock(Movimiento movimiento){ // solo para el mock
+        movimiento.setId(maxId()+1);
+        this.movimientos.add(movimiento);
+        //this.persistenciaEscribir(); //-----------------------------
+        // No va asi no esta sobreescribiendo todo el tiempo
+        //
+        // -----------------------------------------------------------
+    }
+
     public void add(Movimiento movimiento){
         movimiento.setId(maxId()+1);
         this.movimientos.add(movimiento);
+        this.persistenciaEscribir();
     }
+
+    public void addAll(List <Movimiento> listaAgregar){
+        this.movimientos.addAll(listaAgregar);
+        this.persistenciaEscribir();
+    }
+
 
     public Movimiento buscarMovimiento (int idMovimiento){
         for (Movimiento generic : this.movimientos){

@@ -3,6 +3,8 @@ package com.models;
 import com.enums.TipoCliente;
 import com.enums.TipoPersona;
 import com.enums.TipoProveedor;
+import com.models.funciones.Mensajes;
+import com.validaciones.Validaciones;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -36,10 +38,21 @@ public class Cliente extends Persona {
     public Cliente crearCliente() {
         Cliente generic = new Cliente();
         Domicilio domicilio;
-        generic.setNombre(JOptionPane.showInputDialog("Ingrese el nombre:"));
-        generic.setApellido(JOptionPane.showInputDialog("Ingrese el apellido:"));
-        generic.setDni(JOptionPane.showInputDialog("Ingrese el DNI:"));
-        generic.setEmail(JOptionPane.showInputDialog("Ingrese el email:"));
+        generic.setNombre(Mensajes.mensajeReturnString("Ingrese el nombre:"));
+        generic.setApellido(Mensajes.mensajeReturnString("Ingrese el apellido:"));
+        String DNI;
+        do {
+            DNI = Mensajes.mensajeReturnString("Ingrese el DNI:");
+
+            if (DNI == null || !Validaciones.validarDNI(DNI)) {
+                JOptionPane.showMessageDialog(null,
+                        "El DNI ingresado es inválido o se canceló. Por favor, inténtelo nuevamente.",
+                        "Entrada inválida",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } while (DNI == null || !Validaciones.validarDNI(DNI));
+        generic.setDni(DNI);
+        generic.setEmail(Mensajes.mensajeReturnString("Ingrese el email:"));
 
         // Cargar y establecer el domicilio usando JOptionPane
         domicilio = Domicilio.cargarDomicilio();
@@ -47,6 +60,7 @@ public class Cliente extends Persona {
 
         // Establecer el estado activo
         generic.setActive(true);
+        generic.setTipoPersona(TipoPersona.CLIENTE);
         return generic;
     }
 
@@ -85,34 +99,33 @@ public class Cliente extends Persona {
 
     public static Cliente modificarCliente (Cliente c){
     // cliente encontrado (no null)
-    Cliente clienteGenerica = new Cliente();
+    Cliente clienteGenerica = c;
     int modificarMas = JOptionPane.YES_OPTION;
                 while(modificarMas ==JOptionPane.YES_OPTION) {
         String[] opciones = {"Nombre", "Apellido", "Email", "Domicilio"};
-        String atributo = (String) JOptionPane.showInputDialog(null, "Seleccione el atributo a modificar:",
-                "Modificar Cliente", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+        String atributo = Mensajes.mensajeReturnStringConDesplegable(opciones,"Selecionar el Atributo");
         if (atributo != null) {
             switch (atributo) {
-                case "Nombre" -> {
-                    String nuevoNombre = JOptionPane.showInputDialog("Ingrese el nuevo nombre:");
+                case "Nombre" -> { // TODO: Solo verificar que sea tipo String
+                    String nuevoNombre = Mensajes.mensajeReturnString("Ingrese el nuevo nombre:");
                     clienteGenerica.setNombre(nuevoNombre);
                 }
-                case "Apellido" -> {
-                    String nuevoApellido = JOptionPane.showInputDialog("Ingrese el nuevo apellido:");
+                case "Apellido" -> { // TODO: Solo verificar que sea tipo String
+                    String nuevoApellido = Mensajes.mensajeReturnString("Ingrese el nuevo apellido:");
                     clienteGenerica.setApellido(nuevoApellido);
                 }
-                case "Email" -> {
-                    String nuevoEmail = JOptionPane.showInputDialog("Ingrese el nuevo email:");
+                case "Email" -> { // TODO: Solo verificar que sea tipo String
+                    String nuevoEmail = Mensajes.mensajeReturnString("Ingrese el nuevo email:");
                     clienteGenerica.setEmail(nuevoEmail);
                 }
-                case "Domicilio" -> {
-                    JOptionPane.showMessageDialog(null, "Ingrese el nuevo domicilio");
+                case "Domicilio" -> { // TODO: Solo verificar que los tipos Mensajes den bien
+                    Mensajes.mensajeOut( "Ingrese el nuevo domicilio");
                     clienteGenerica.setDomicilio(Domicilio.cargarDomicilio());
                 }
-                default -> JOptionPane.showMessageDialog(null, "Opción no válida.");
+                default -> Mensajes.mensajeOut( "Opción no válida.");
             }
         }
-        modificarMas = JOptionPane.showConfirmDialog(null, "¿Quiere modificar más datos?", "Modificar Cliente", JOptionPane.YES_NO_OPTION);
+        modificarMas = Mensajes.mensajeYesNO( "¿Quiere modificar más datos?");
     }
 
     return clienteGenerica;

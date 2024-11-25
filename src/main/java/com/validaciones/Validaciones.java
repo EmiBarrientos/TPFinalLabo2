@@ -2,6 +2,7 @@ package com.validaciones;
 
 import com.excepciones.EmailFormatExcepcion;
 import com.excepciones.StringTooLongException;
+import com.models.funciones.Mensajes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,32 +14,49 @@ public class Validaciones {
 
     public static boolean validarFecha(String fechaStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
         try {
             // Intentar parsear la cadena
+            if(fechaStr.contains("-")){
+                LocalDate fecha = LocalDate.parse(fechaStr, formatter2);
+                return true;
+            }
             LocalDate fecha = LocalDate.parse(fechaStr, formatter);
-            return true; // Fecha válida
+            return true;
+            // Fecha válida
         } catch (DateTimeParseException e) {
-            System.out.println("Formato no válido. Formato correcto: dd/MM/yyyy " + e);
+            System.out.println("Validaciones: Formato no válido. Formato correcto: dd/MM/yyyy " + e);
             return false; // Fecha no válida
         }
     }
 
     public static boolean validarDNI(String dni) {
         try {
-            if (dni.length() == 8 || dni.length()==11) {
+            if (dni.length() == 8 || dni.length() == 11) {
                 //Intenta parsear la cadena
                 Integer.parseInt(dni);
                 return true;
             } else {
                 throw new StringTooLongException("Not valid input");
             }
-        }catch (NumberFormatException e){
-            System.out.println("Invalid input. Input MUST be only numbers "+ e.getMessage());
-            return false;
-        }catch (StringTooLongException e) {
-            System.out.println("ERR" + e.getMessage());
+        }
+        catch (NullPointerException e) {
+            Mensajes.mensajeOut("Invalid input. Input Null" + e.getMessage());
             return false;
         }
+        catch (NumberFormatException e) {
+            Mensajes.mensajeOut("Invalid input. Input MUST be only numbers " + e.getMessage());
+            return false;
+        } catch (StringTooLongException e) {
+            Mensajes.mensajeOut("ERR" + e.getMessage());
+            return false;
+        }
+        catch (Exception e) {
+            Mensajes.mensajeOut("Invalid input" + e.getMessage());
+            return false;
+        }
+
     }
 
     public static boolean validarEmail(String email){
@@ -54,7 +72,6 @@ public class Validaciones {
             System.out.println(e.getMessage());
             return false;
         }
-
 
     }
 

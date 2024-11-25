@@ -3,6 +3,7 @@ package com.models;
 import com.enums.TipoDeMovimiento;
 import com.models.funciones.Listas;
 import com.models.funciones.Mensajes;
+import org.example.ArchivoUtil;
 
 import javax.swing.*;
 import java.sql.SQLInvalidAuthorizationSpecException;
@@ -11,11 +12,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PedidosList {
-    ArrayList<Pedido> pedidosList;
+    private ArrayList<Pedido> pedidosList;
+    private static final String archivo = "pedidos.csv";
 
     public PedidosList() {
         this.pedidosList=new ArrayList<>();
+        List<Pedido> listas = persistenciaLeer();
+        if(listas != null){
+            pedidosList= new ArrayList<>(listas);}
     }
+
+    private List<Pedido> persistenciaLeer(){
+        ArchivoUtil.crearArchivo(archivo);
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Pedido.class);
+        return archivoUtil.leerArchivoPedidos(";");
+    }
+
+    private void persistenciaEscribir(){
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Pedido.class);
+        archivoUtil.escribirArchivo(this.pedidosList,";");
+    }
+
+    public void persistenciaEscribirMock(){ // public solo para usar con el mock
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Pedido.class);
+        archivoUtil.escribirArchivo(this.pedidosList,";");
+    }
+
 
     public ArrayList<Pedido> getPedidosList() {
         return pedidosList;
@@ -32,7 +54,14 @@ public class PedidosList {
     public  void addPedido(Pedido p){
         p.asignarId(this.maxId());
         this.pedidosList.add(p);
+        this.persistenciaEscribir();
     }
+
+    public void addAll(List <Pedido> listaAgregar){
+        this.pedidosList.addAll(listaAgregar);
+        this.persistenciaEscribir();
+    }
+
 
     public int maxId(){
         if (pedidosList.isEmpty()==true){return 0;}
@@ -49,10 +78,16 @@ public class PedidosList {
         return this.pedidosList.get(pedidosList.size()-1); // Devuelve el último pedido
     }
 
+    public void cambiarEstadoPedidoMock(Pedido p){
+        int index = this.pedidosList.indexOf(p);
+        p.setEjecutado(true);
+        this.pedidosList.set(index,p);
+    }
     public void cambiarEstadoPedido(Pedido p){
         int index = this.pedidosList.indexOf(p);
         p.setEjecutado(true);
         this.pedidosList.set(index,p);
+        this.persistenciaEscribir();
     }
 
     //-------19/11 Agus
@@ -78,6 +113,7 @@ public class PedidosList {
         if (index>-1) {
             if(JOptionPane.YES_OPTION== Mensajes.mensajeYesNO("Confirma que lo quiere eliminar?")){
                 this.pedidosList.remove(index);
+                this.persistenciaEscribir();
             return null;}
             return this.pedidosList.get(index);
         }
@@ -95,6 +131,7 @@ public class PedidosList {
             }
             index ++;
         }
+        this.persistenciaEscribir();
     }
 
     public List<Listas> informePendienteEjecutado(boolean estado) {

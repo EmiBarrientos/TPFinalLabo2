@@ -1,29 +1,5 @@
 package org.example;
-/*
-forma de uso con Persona por ejemplo:
-// el archivo debe existir previamente sino se puede poner la siguiente sentencias para informes:
-        if (!Files.exists(Paths.get(archivoCSV))) {
-            try {
-                Files.createFile(Paths.get(archivoCSV));
-                System.out.println("Archivo creado: " + archivoCSV);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-// crea el archivo si no existe
 
-ArchivoUtil<Persona> archivo = new ArchivoUtil<>(archivoCSV, Persona.class); // ubicar archivo (archivo, Class)
-List<Persona> personas = archivo.leerArchivo(";");
-archivo.escribirArchivo(personas, ";");
-
-// Escribir archivo
-    archivoUtil.escribirArchivo(personas, ";");
-
-Notas
-La clases debe seguir el estándar JavaBean
-(atributos privados, constructor sin parámetros, getters y setters).
-Adaptar el separador si es necesario (;, ,, etc.).
- */
 
 import com.enums.*;
 import com.models.*;
@@ -33,11 +9,10 @@ import java.io.*;
         import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.*;
+import java.sql.SQLOutput;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -45,7 +20,6 @@ public class ArchivoUtil<T> {
 
     private final String archivoCSV;
     private final Class<T> clazz; // Clase genérica para reflexiones
-    private final AtomicInteger numeroDeVersion = new AtomicInteger(0);
 
     public ArchivoUtil(String archivoCSV, Class<T> clazz) {
         this.archivoCSV = archivoCSV;
@@ -53,7 +27,6 @@ public class ArchivoUtil<T> {
     }
 
     public List<T> leerArchivo(String separador) {
-
         List<T> lista = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(archivoCSV), "ISO-8859-1"))) {
             String linea;
@@ -76,14 +49,6 @@ public class ArchivoUtil<T> {
 
                 lista.add(obj);
 
-                // Si el archivo contiene un número de versión en la última columna
-                if (campos.length > datos.length && datos.length > 0) {
-                    try {
-                        numeroDeVersion.set(Integer.parseInt(datos[datos.length - 1]));
-                    } catch (NumberFormatException e) {
-                        System.out.println("Número de versión no válido: " + datos[datos.length - 1]);
-                    }
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,11 +68,12 @@ public class ArchivoUtil<T> {
                     System.out.println(i+": "+ datos[i]);
                 }*/
 
-                Persona persona = null;
+                Persona persona;
 
-                if (datos[6].equals("CLIENTE")) {  // Supongamos que el primer campo identifica si es Cliente
+
+                if (datos[5].equals("CLIENTE")) {  // Supongamos que el primer campo identifica si es Cliente
                     persona = new Cliente();
-                } else if (datos[6].equals("PROVEEDOR")) {  // O si es Proveedor
+                } else if (datos[5].equals("PROVEEDOR")) {  // O si es Proveedor
                     persona = new Proveedor();
                 } else {
                     throw new IllegalArgumentException("Tipo de persona desconocido en los datos.");
@@ -115,11 +81,9 @@ public class ArchivoUtil<T> {
 
                 // Reflexión para rellenar los campos del objeto
                 Field[] campos = persona.getClass().getSuperclass().getDeclaredFields();
-                System.out.println("cantidad de campos: " + campos.length);
                 for (int i = 0; i < campos.length && i < datos.length; i++) {
                     Field campo = campos[i];
                     campo.setAccessible(true);
-                    System.out.println(i+" |atributo: "+campo.getType().toString() + "|dato: "+datos[i]);
                     Object valor = convertirValor(campo.getType(), datos[i]);
                     if (valor != null) {
                         campo.set(persona, valor);
@@ -128,14 +92,7 @@ public class ArchivoUtil<T> {
 
                 lista.add(persona);
 
-                // Si el archivo contiene un número de versión en la última columna
-                if (campos.length > datos.length && datos.length > 0) {
-                    try {
-                        numeroDeVersion.set(Integer.parseInt(datos[datos.length - 1]));
-                    } catch (NumberFormatException e) {
-                        System.out.println("Número de versión no válido: " + datos[datos.length - 1]);
-                    }
-                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,19 +101,64 @@ public class ArchivoUtil<T> {
 
     }
 
+    public List<Pedido> leerArchivoPedidos(String separador) {// List<PedidoLinea> no es class asi que complica la lectura generica
+        List<Pedido> lista = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(archivoCSV), "ISO-8859-1"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {// lee lineas hasta que se acaben
+                String[] partes = linea.split(separador);
+                /*for(int i = 0 ; i< datos.length; i++){
+                    System.out.println(i+": "+ datos[i]);
+                }*/
+                Pedido pedido = new Pedido();
+                // Extraer contenido entre corchetes
+                //String contenido = datos.substring(datos.indexOf("[") + 1, datos.lastIndexOf("]"));
+                //        + ", id="+id
+                //        + " [idCuenta=" + idCuenta
+                //        + ", tipoDePedido=" + tipoDePedido
+                //        + ", montoTotal=" + montoTotal
+                //        + ", ejecutado=" + ejecutado
+                //        +  ", lineasPedidoLineas="
+                //        + lineasPedidoLineas
+                // Extraer los valores de los atributos desde la cadena
+                String id = partes[0];
+                String idCuenta = partes[1];
+                String tipoDePedidoStr = partes[2];
+                String montoTotal = partes[3];
+                String ejecutadoStr = partes[4];;
+                String lineasPedidoLineasStr = partes[5];
+                List<PedidoLinea> lineasPedidos = crearLineasPedidoDesdeString(lineasPedidoLineasStr);;
+
+                // Mapear los valores extraídos a los atributos del objeto Pedido
+                pedido.setId(Integer.parseInt(id));
+                pedido.setIdCuenta(Integer.parseInt(idCuenta));
+                pedido.setTipoDePedido(TipoDeMovimiento.valueOf(tipoDePedidoStr)); // Enum convertido desde String
+                pedido.setMontoTotal(Double.parseDouble(montoTotal));
+                pedido.setEjecutado(Boolean.parseBoolean(ejecutadoStr));
+                pedido.setLineasPedidos(lineasPedidos);
+                lista.add(pedido);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+
+    }
+
+
     public void escribirArchivo(List<T> lista, String separador) {
-        String archivoCopia = archivoCSV.replace(".csv", "_backup_" +LocalDate.now() +"_"+ numeroDeVersion +"_"+ UUID.randomUUID().toString()+ ".csv");
+        String archivoCopia = archivoCSV.replace(".csv", "_backup_" +LocalDate.now() + ".csv");
         Path rutaOriginal = Paths.get(archivoCSV);
         Path rutaCopia = Paths.get(archivoCopia);
 
         try {
-            Files.copy(rutaOriginal, rutaCopia);
+            Files.copy(rutaOriginal, rutaCopia, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             System.err.println("Error al generar el respaldo.");
             e.printStackTrace();
         }
 
-        numeroDeVersion.incrementAndGet(); // Incrementar la versión
 
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivoCSV), "ISO-8859-1"))) {
             for (T obj : lista) {
@@ -182,10 +184,104 @@ public class ArchivoUtil<T> {
         }
     }
 
+    public void escribirArchivoPedido(List<Pedido> listaPedido, String separador) {
+        // Generar el archivo de respaldo
+        String archivoCopia = archivoCSV.replace(".csv", "_backup_" + LocalDate.now() + ".csv");
+        Path rutaOriginal = Paths.get(archivoCSV);
+        Path rutaCopia = Paths.get(archivoCopia);
+
+        try {
+            Files.copy(rutaOriginal, rutaCopia, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            System.err.println("Error al generar el respaldo del archivo.");
+            e.printStackTrace();
+        }
+
+        // Verificar si la lista está vacía
+        if (listaPedido == null || listaPedido.isEmpty()) {
+            System.err.println("La lista de movimientos está vacía. No se generará el archivo.");
+            return;
+        }
+
+        // Escribir los datos en el archivo CSV
+        try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivoCSV), "UTF-8"))) {
+            for (Pedido obj : listaPedido) {
+                StringBuilder linea = new StringBuilder();
+
+                // Agregar los campos del objeto Movimiento
+                linea.append(obj.getIdCuenta()).append(separador)
+                        .append(obj.getTipoDePedido()).append(separador)
+                        .append(obj.getLineasPedidos()).append(separador)
+                        .append(obj.getMontoTotal()).append(separador)
+                        .append(obj.isEjecutado()).append(separador)
+                        .append(obj.getId());
+
+                // Escribir la línea en el archivo
+                pw.println(linea.toString());
+            }
+        } catch (Exception e) {
+            System.err.println("Error al escribir en el archivo CSV.");
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void escribirArchivoMov(List<Movimiento> listaMovimientos, String separador) {
+        // Generar el archivo de respaldo
+        String archivoCopia = archivoCSV.replace(".csv", "_backup_" + LocalDate.now() + ".csv");
+        Path rutaOriginal = Paths.get(archivoCSV);
+        Path rutaCopia = Paths.get(archivoCopia);
+
+        try {
+            Files.copy(rutaOriginal, rutaCopia, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            System.err.println("Error al generar el respaldo del archivo.");
+            e.printStackTrace();
+        }
+
+        // Verificar si la lista está vacía
+        if (listaMovimientos == null || listaMovimientos.isEmpty()) {
+            System.err.println("La lista de movimientos está vacía. No se generará el archivo.");
+            return;
+        }
+
+        // Escribir los datos en el archivo CSV
+        try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivoCSV), "UTF-8"))) {
+            for (Movimiento obj : listaMovimientos) {
+                StringBuilder linea = new StringBuilder();
+
+                // Agregar los campos del objeto Movimiento
+                linea.append(obj.getId()).append(separador)
+                        .append(obj.getFecha()).append(separador)
+                        .append(obj.getCuenta()).append(separador)
+                        .append(obj.getProductosComercializados()).append(separador)
+                        .append(obj.getMontoTotal()).append(separador)
+                        .append(obj.getSaldoAnterior()).append(separador)
+                        .append(obj.getSaldoModificado()).append(separador)
+                        .append(obj.getDescripcion());
+
+                // Escribir la línea en el archivo
+                pw.println(linea.toString());
+            }
+        } catch (Exception e) {
+            System.err.println("Error al escribir en el archivo CSV.");
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
     //------------- convertir valores desde string
 
     private Object convertirValor(Class<?> tipo, String dato) {
         try {
+            if (tipo == LocalDate.class ) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                System.out.println(dato);
+                return LocalDate.parse(dato,formatter);}
             if (tipo == int.class || tipo == Integer.class) {
                 return Integer.parseInt(dato);
             } else if (tipo == float.class || tipo == Float.class) {
@@ -226,11 +322,10 @@ public class ArchivoUtil<T> {
             }
 
         } catch (Exception e) {
-            System.out.println("Error al convertir valor: " + dato + " a tipo " + tipo.getName());
+            System.out.println("ArchivoUtil Error al convertir valor: " + dato + " a tipo " + tipo.getName());
         }
         return null;
     }
-//--------- esto tengo que meterle ;
 
 
 
@@ -255,36 +350,69 @@ public class ArchivoUtil<T> {
     }
 
     private Producto crearProductoDesdeString(String datos) {
+
+        /*
+        Producto [idProd=2
+                , nombre=Producto_2
+                , marca=Marca_5
+                , categoria=CAT1
+                , stock=34
+                , precioCompra=7695.7
+                , precioVenta=9619.6
+                , FechaVen=FechaVen
+                , porcentajeVenta=porcentajeVenta
+                , proveedor=Proveedor [id=78, nombre=Nombre_78, apellido=Apellido_78, dni=67692798, domicilio=Domicilio [calle=Calle_33, altura=2361, piso=10, depto=K], tipoPersona=PROVEEDOR, email=persona78@example.com, active=false]]
+                */
         try {
-            // Dividir la cadena usando punto y coma como delimitador
-            String[] partes = datos.split(";");
+        int inicio = datos.indexOf("Producto [idProd=") + "Producto [idProd=".length();
+        int fin = datos.indexOf(", nombre=");
+        String idProdStr = datos.substring(inicio, fin);
+        int idProd = Integer.parseInt(idProdStr);
 
-            // Verificar que la cadena tenga el número correcto de partes
-            if (partes.length != 12) { // Esperamos 12 partes para todos los atributos
-                throw new IllegalArgumentException("El formato del String no es válido. Se esperaban 12 atributos.");
-            }
+        inicio = datos.indexOf(", nombre=") + ", nombre=".length();
+        fin = datos.indexOf(", marca=");
+        String nombre = datos.substring(inicio, fin);
 
-            // Extraer los valores correspondientes de cada parte
-            int idProd = Integer.parseInt(partes[0].trim()); // ID del producto
-            double precioCompra = Double.parseDouble(partes[1].trim()); // Precio de compra
-            String nombre = partes[2].trim(); // Nombre del producto
-            String marca = partes[3].trim();  // Marca del producto
-            CatProducto categoria = crearEnumDesdeString(partes[4].trim(), CatProducto.class); // Categoría (Enum)
-            int stock = Integer.parseInt(partes[5].trim()); // Stock del producto
-            double precioVenta = Double.parseDouble(partes[6].trim()); // Precio de venta
-            // Se pueden agregar otros datos si es necesario
-            // String fechaVen = partes[7].trim(); // Fecha de vencimiento (si es necesario)
-            // Algunos campos pueden estar vacíos, se manejan como "" o nulos
-            String fechaVen = partes[7].trim().isEmpty() ? null : partes[7].trim(); // Se maneja el valor vacío
-            int porcentajeVenta = Integer.parseInt(partes[8].trim()); // Porcentaje de venta
+        inicio = datos.indexOf(", marca=") + ", marca=".length();
+        fin = datos.indexOf(", categoria=");
+        String marca = datos.substring(inicio, fin);
 
-            // Crear el objeto Proveedor a partir de la última parte de la cadena
-            System.out.println(partes[9].trim().toString());
-            Proveedor proveedor = crearProveedorDesdeString(partes[9].trim());
+        inicio = datos.indexOf(", categoria=") + ", categoria=".length();
+        fin = datos.indexOf(", stock=");
+        String categoriaStr = datos.substring(inicio, fin);
+        CatProducto categoria = crearEnumDesdeString(categoriaStr, CatProducto.class); // Categoría (Enum)
 
-            // Crear el objeto Producto con el constructor por defecto
+        inicio = datos.indexOf(", stock=") + ", stock=".length();
+        fin = datos.indexOf(", precioCompra=");
+        String stockSrt = datos.substring(inicio, fin);
+        int stock = Integer.parseInt(stockSrt);
+
+        inicio = datos.indexOf(", precioCompra=") + ", precioCompra=".length();
+        fin = datos.indexOf(", precioVenta=");
+        String precioCompraSrt = datos.substring(inicio, fin);
+        Double precioCompra = Double.parseDouble(precioCompraSrt);
+
+        inicio = datos.indexOf(", precioVenta=") + ", precioVenta=".length();
+        fin = datos.indexOf(", FechaVen=");
+        String precioVentaSrt = datos.substring(inicio, fin);
+        Double precioVenta = Double.parseDouble(precioVentaSrt);
+
+        inicio = datos.indexOf(", FechaVen=") + ", FechaVen=".length();
+        fin = datos.indexOf(", porcentajeVenta=");
+        String fechaVen = datos.substring(inicio, fin);
+
+        inicio = datos.indexOf(", porcentajeVenta=") + ", porcentajeVenta=".length();
+        fin = datos.indexOf(", proveedor=");
+        String porcentajeVentaStr = datos.substring(inicio, fin);
+        int porcentajeVenta = Integer.parseInt(porcentajeVentaStr);
+
+        inicio = datos.indexOf(", proveedor=") + ", proveedor=".length();
+        fin = (datos.length()-1);
+        String proveedorStr = datos.substring(inicio, fin);
+        Proveedor proveedor = crearProveedorDesdeString(proveedorStr);
+
+         // Crear el objeto Producto con el constructor por defecto
             Producto producto = new Producto();
-
             // Asignar los valores a los atributos del Producto
             producto.setIdProd(idProd);
             producto.setNombreProd(nombre);
@@ -307,33 +435,66 @@ public class ArchivoUtil<T> {
     }
 
     private Cuenta crearCuentaDesdeString(String datos) {
-        System.out.println("Entrando en crear cuenta");
+
+        /*
+        *
+        *Cuenta [id=4008
+        //, persona=Cliente [id=1001, nombre=Pedro, apellido=M, dni=30196270, domicilio=Domicilio [calle=siempre, altura=136, piso=0, depto=z], tipoPersona=CLIENTE, email=da@da, active=true]
+        //, idPersona=1001
+        //, saldo=324545.0
+        //, tipoCuenta=PESOSEFECTIVO
+        //, activa=true] */
         try {
-            // Extraer contenido entre corchetes
-            String contenido = datos.substring(datos.indexOf("[") + 1, datos.lastIndexOf("]"));
-            String[] partes = contenido.split(", ");
+        int inicio = datos.indexOf("Cuenta [id=") + "Cuenta [id=".length();
+        int fin = datos.indexOf(", persona=");
+        String idStr = datos.substring(inicio, fin);
+        int id = Integer.parseInt(idStr);
 
-            // Mapear atributos, eliminando espacios innecesarios
-            int id = Integer.parseInt(partes[0].split("=")[1].trim());
-            int idPersona = Integer.parseInt(partes[1].split("=")[1].trim());
-            double saldo = Double.parseDouble(partes[2].split("=")[1].trim());
+        inicio = datos.indexOf(", persona=") + ", persona=".length();
+        fin = datos.indexOf(", idPersona=");
+        String personaStr = datos.substring(inicio, fin);
 
-            // Conversión segura del tipo de cuenta
-            String tipoCuentaStr = partes[3].split("=")[1].trim().toUpperCase();
-            System.out.println("string de tipo cuenta");
-            System.out.println(tipoCuentaStr);
-            TipoCuenta tipoCuenta = TipoCuenta.valueOf(tipoCuentaStr);
+        inicio = datos.indexOf(", idPersona=") + ", idPersona=".length();
+        fin = datos.indexOf(", saldo=");
+        String idPersonaStr = datos.substring(inicio, fin);
+        int idPersona = Integer.parseInt(idPersonaStr);
 
-            boolean activa = Boolean.parseBoolean(partes[4].split("=")[1].trim());
+        inicio = datos.indexOf(", saldo=") + ", saldo=".length();
+        fin = datos.indexOf(", tipoCuenta=");
+        String saldoStr = datos.substring(inicio, fin);
+        Double saldo = Double.parseDouble(saldoStr);
+
+        inicio = datos.indexOf(", tipoCuenta=") + ", tipoCuenta=".length();
+        fin = datos.indexOf(", activa=");
+        String tipoCuentaStr = datos.substring(inicio, fin);
+        TipoCuenta tipoCuenta = TipoCuenta.valueOf(tipoCuentaStr);
+
+        inicio = datos.indexOf(", activa=") + ", activa=".length();
+        fin = datos.length()-1;
+        String activaStr = datos.substring(inicio, fin);
+        boolean activa = Boolean.parseBoolean(activaStr);
 
             // Crear la instancia de Cuenta
             Cuenta cuenta = new Cuenta();
             cuenta.setId(id); // Si tienes un setter para ID
             cuenta.setIdPersona(idPersona);
+
+            if(personaStr.contains("Cliente")==true){
+                Cliente persona = new Cliente();
+                persona = crearClienteDesdeString(personaStr);
+                cuenta.setPersona(persona);
+            }
+            else{
+                Proveedor persona = new Proveedor();
+                persona = crearProveedorDesdeString(personaStr);
+                cuenta.setPersona(persona);
+            }
+
             cuenta.setSaldo(saldo);
             cuenta.setTipoCuenta(tipoCuenta);
             cuenta.setActiva(activa);
-
+            if(cuenta.getIdPersona()!=cuenta.getPersona().getId()){
+                throw new IllegalArgumentException("no coinciden los id");} // integridad del dato persona
             return cuenta;
         } catch (IllegalArgumentException e) {
             System.err.println("Error al convertir tipoCuenta: " + e.getMessage());
@@ -352,7 +513,7 @@ public class ArchivoUtil<T> {
                 + ", productosComercializados=" + productosComercializados
                 + ", montoTotal=" + montoTotal + ", saldoAnterior=" + saldoAnterior
                 + ", saldoModificado=" + saldoModificado + ", descripcion=" + descripcion + "]";*/
-
+        try{
         String id = datos.substring(datos.indexOf("id=") + 3, datos.lastIndexOf(","));
         String fecha = datos.substring(datos.indexOf("fecha=") + 6, datos.lastIndexOf(","));
         String montoTotal = datos.substring(datos.indexOf("montoTotal=") + 11, datos.lastIndexOf(","));
@@ -373,36 +534,68 @@ public class ArchivoUtil<T> {
         movimiento.setSaldoModificado(Double.parseDouble(saldoModificado));
         movimiento.setProductosComercializados(productosComercializados);
         movimiento.setCuenta(cuenta);
+
+        if(movimiento.getCuenta().getId()!=movimiento.getProductosComercializados().getIdCuenta()){
+            throw new IllegalArgumentException("no coinciden los id");} // integridad del dato cuenta y pedido
         return movimiento;
+        } catch (IllegalArgumentException e) {
+        System.err.println("Error al convertir tipoCuenta: " + e.getMessage());
+        return null;
+        } catch (Exception e) {
+        System.err.println("Error al crear Cuenta desde String: " + e.getMessage());
+        return null;
+        }
     }
 
 
     private Pedido crearPedidoDesdeString(String datos) {
         Pedido pedido = new Pedido();
-        /*
-        return getClass().getSimpleName() + " [id=" + id + ", idCuenta=" + idCuenta + ", tipoDePedido=" + tipoDePedido
-                + ", montoTotal=" + montoTotal + ", ejecutado=" + ejecutado + ", eliminado=" + eliminado
-                + ", lineasPedidoLineas=" + lineasPedidoLineas + "]";
-                */
-        // Extraer los valores de los atributos desde la cadena
-        String id = datos.substring(datos.indexOf("id=") + 3, datos.indexOf(", idCuenta="));
-        String idCuenta = datos.substring(datos.indexOf("idCuenta=") + 9, datos.indexOf(", tipoDePedido="));
-        String tipoDePedidoStr = datos.substring(datos.indexOf("tipoDePedido=") + 13, datos.indexOf(", montoTotal="));
-        String montoTotal = datos.substring(datos.indexOf("montoTotal=") + 11, datos.indexOf(", ejecutado="));
-        String ejecutadoStr = datos.substring(datos.indexOf("ejecutado=") + 10, datos.indexOf(", eliminado="));
-        String lineasPedidoLineasStr = datos.substring(datos.indexOf("lineasPedidoLineas=") + 19, datos.lastIndexOf("]"));
+        // Extraer contenido entre corchetes
+        //String contenido = datos.substring(datos.indexOf("[") + 1, datos.lastIndexOf("]"));
+        /*        Pedido, id=0 listo
+                 [idCuenta=4008 listo
+                        , tipoDePedido=VENTA
+                        , montoTotal=57810.0
+                        , ejecutado=false
+                        , lineasPedidoLineas=[PedidoLinea [producto=Producto [idProd=1, nombre=Producto_1, marca=Marca_5, categoria=CAT3, stock=11, precioCompra=2312.4, precioVenta=2890.5, FechaVen=null, porcentajeVenta=25, proveedor=Proveedor [id=661, nombre=Nombre_661, apellido=Apellido_661, dni=09840321, domicilio=Domicilio [calle=Calle_5, altura=4352, piso=4, depto=L], tipoPersona=PROVEEDOR, email=persona661@example.com, active=false]], cantidad=20, montoCompra=2312.4, montoVenta=2890.5]
+        ]]*/
+        int inicio = datos.indexOf("Pedido, id=") + "Pedido, id=".length();
+        int fin = datos.indexOf(" [idCuenta="); //listo
+        String idStr = datos.substring(inicio, fin);
+        int id = Integer.parseInt(idStr);
+
+        inicio = datos.indexOf(" [idCuenta=") + " [idCuenta=".length();
+        fin = datos.indexOf(", tipoDePedido="); //listo
+        String idCuentaStr = datos.substring(inicio, fin);
+        int idCuenta = Integer.parseInt(idCuentaStr);
+
+        inicio = datos.indexOf(", tipoDePedido=") + ", tipoDePedido=".length();
+        fin = datos.indexOf(", montoTotal="); // listo
+        String tipoDePedidoStr = datos.substring(inicio, fin);
+        TipoDeMovimiento tipoDePedido = TipoDeMovimiento.valueOf(tipoDePedidoStr);
+
+        inicio = datos.indexOf(", montoTotal=") + ", montoTotal=".length();
+        fin = datos.indexOf(", ejecutado="); // listo
+        String montoTotalStr = datos.substring(inicio, fin);
+        Double montoTotal = Double.parseDouble(montoTotalStr);
+
+        inicio = datos.indexOf(", ejecutado=") + ", ejecutado=".length();
+        fin = datos.indexOf(", lineasPedidoLineas="); //
+        String ejecutadoStr = datos.substring(inicio, fin);
+        boolean ejecutado = Boolean.parseBoolean(ejecutadoStr);
+
+        inicio = datos.indexOf(", lineasPedidoLineas=") + ", lineasPedidoLineas=".length();
+        fin = datos.length()-1; //
+        String lineasPedidosStr = datos.substring(inicio, fin);
+        List<PedidoLinea> lineasPedidos = crearLineasPedidoDesdeString(lineasPedidosStr);
 
         // Mapear los valores extraídos a los atributos del objeto Pedido
-        pedido.setId(Integer.parseInt(id));
-        pedido.setIdCuenta(Integer.parseInt(idCuenta));
-        pedido.setTipoDePedido(TipoDeMovimiento.valueOf(tipoDePedidoStr)); // Enum convertido desde String
-        pedido.setMontoTotal(Double.parseDouble(montoTotal));
-        pedido.setEjecutado(Boolean.parseBoolean(ejecutadoStr));
-
-
-        List<PedidoLinea> lineasPedido = crearLineasPedidoDesdeString(lineasPedidoLineasStr);
-        pedido.setLineasPedidos(lineasPedido);
-
+        pedido.setId(id);
+        pedido.setIdCuenta(idCuenta);
+        pedido.setTipoDePedido(tipoDePedido); // Enum convertido desde String
+        pedido.setMontoTotal(montoTotal);
+        pedido.setEjecutado(ejecutado);
+        pedido.setLineasPedidos(lineasPedidos);
         return pedido;
     }
 
@@ -410,15 +603,32 @@ public class ArchivoUtil<T> {
         List<PedidoLinea> lineasPedido = new ArrayList<>();
 
         // Eliminar los corchetes iniciales y finales de la lista si existen
-        lineasPedidoLineasStr = lineasPedidoLineasStr.substring(1, lineasPedidoLineasStr.length() - 1);
-
+        lineasPedidoLineasStr = lineasPedidoLineasStr.substring(13, lineasPedidoLineasStr.length() - 1);
         // Dividir la cadena en objetos PedidoLinea individuales
-        String[] lineas = lineasPedidoLineasStr.split("], PedidoLinea \\[");
+
+                String[] lineas = lineasPedidoLineasStr.split(", PedidoLinea \\[");
+            int inicio = lineas[0].indexOf("producto=") + ("producto=").length();
+            int fin = lineas[0].indexOf(", cantidad=");
+            String producto = lineas[0].substring(inicio, fin);
+
+            inicio = lineas[0].indexOf(", cantidad=") + ", cantidad=".length();
+            fin = lineas[0].indexOf(", montoCompra=");
+            String cantidad = lineas[0].substring(inicio, fin);
+
+            inicio = lineas[0].indexOf(", montoCompra=") + ", montoCompra=".length();
+            fin = lineas[0].indexOf(", montoVenta=");
+            String montoCompra = lineas[0].substring(inicio, fin);
+
+            inicio = lineas[0].indexOf(", montoVenta=") + ", montoVenta=".length();
+            fin = lineas[0].length()-1;
+            String montoVenta = lineas[0].substring(inicio, fin);
+
+            ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(lineas));
 
         // Procesar cada línea y crear el objeto PedidoLinea
-        for (String linea : lineas) {
+        for (String linea : arrayList) {
             // Reconstruir el formato esperado si es necesario
-            linea = "PedidoLinea [" + linea.trim() + "]";
+            // Posición de la primera frase delimitadora
             PedidoLinea pedidoLinea = crearPedidoLineaDesdeString(linea);
             lineasPedido.add(pedidoLinea);
         }

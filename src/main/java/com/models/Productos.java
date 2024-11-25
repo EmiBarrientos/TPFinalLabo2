@@ -2,15 +2,16 @@ package com.models;
 
 import com.models.funciones.Listas;
 import com.models.funciones.Mensajes;
+import org.example.ArchivoUtil;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class Productos {
     private ArrayList<Producto> productos; // agregue que sea private
+    private static final String archivo =  "productos.csv";
 
     public Productos(ArrayList<Producto> productos) {
         this.productos = productos;
@@ -22,8 +23,23 @@ public class Productos {
     }
 
     public Productos() {
-        productos = new ArrayList<>(0);
+        productos = new ArrayList<>();
+        List<Producto> listas = persistenciaLeer();
+        if(listas != null){
+            productos = new ArrayList<>(listas);}
     }
+
+    private List<Producto> persistenciaLeer(){
+        ArchivoUtil.crearArchivo(archivo);
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Producto.class);
+        return archivoUtil.leerArchivo(";");
+    }
+
+    private void persistenciaEscribir(){
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Producto.class);
+        archivoUtil.escribirArchivo(this.productos,";");
+    }
+
 
     public void agregarProductos(Producto p) {
         productos.add(p);
@@ -96,11 +112,13 @@ public class Productos {
         if (this.checkearNoExisteProducto(producto) == -1) {
             producto.setIdProd(maxId()+1); // asigna id a producto e incrementa el contador
             productos.add(producto); // agrega el producto al inventario
+            this.persistenciaEscribir();
         }
     }
 
     public void addAll(List <Producto> listaAgregar){
         this.productos.addAll(listaAgregar);
+        this.persistenciaEscribir();
     }
 
     // le paso un productoConAtributosCambiado
@@ -125,12 +143,14 @@ public class Productos {
 
         int index = this.buscarProductoCriterioID(nuevoProducto); // busca por id y devuelve index o -1
         this.productos.set(index, nuevoProducto);
+        this.persistenciaEscribir();
     }
 
     public void actualizarStockPorPedidos(Pedido pedido) {
         for (PedidoLinea generic : pedido.getLineasPedidos()) {
             this.modificarProductosPorProducto(generic.getProducto());
         }
+        this.persistenciaEscribir();
     }
 
 
@@ -157,6 +177,7 @@ public class Productos {
         productoNuevo = Producto.cargarProducto();
         this.addProducto(productoNuevo);
         Mensajes.mensajeOut("Producto cargado");
+        this.persistenciaEscribir();
         return productoNuevo;
     }
 
@@ -165,12 +186,13 @@ public class Productos {
         String nombre = Mensajes.mensajeReturnString("Ingrese el nombre del Producto");
         int index = this.buscarProductoNombre(nombre);
         if(index==-1){
-            Mensajes.mensajeOut("Ya existe el producto");
+            Mensajes.mensajeOut("No existe el producto");
             return null;
         }
         productoNuevo = Producto.cargarProducto();
         this.productos.remove(index);
         Mensajes.mensajeOut("Producto Dado de Baja");
+        this.persistenciaEscribir();
         return productoNuevo;
     }
 
@@ -194,6 +216,7 @@ public class Productos {
         if (producto.mostrarProducto() == JOptionPane.YES_OPTION) {
             Mensajes.mensajeOut("Se agrega el producto nuevo al inventario SIN STOCK");
             this.addProducto(producto);
+            this.persistenciaEscribir();
             return this.ultimoProductoAgregado();
         }
     return null;
@@ -232,32 +255,5 @@ public class Productos {
 
         return informe;
     }
-
-
-    public void mostrarProductos(String nombre){
-        for(Producto generic : this.productos){
-            if(nombre == generic.getNombreProd()){
-            System.out.println(generic);}
-        }
-    }
-
-
-
-
-    public void mostrarProductos(Proveedor proveedor){
-        for(Producto generic : this.productos){
-            if(proveedor == generic.getProveedor()){
-                System.out.println(generic);}
-        }
-    }
-
-    public void mostrarProductos(){
-        for(Producto generic : this.productos){
-                System.out.println(generic);
-        }
-    }
-
-
-
 
 }

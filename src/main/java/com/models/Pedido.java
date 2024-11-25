@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pedido {
-    private List<PedidoLinea> lineasPedidoLineas;
+
+    private int id;
+    private int idCuenta;
     private TipoDeMovimiento tipoDePedido;
     private Double montoTotal;
-    private int idCuenta;
     private boolean ejecutado=false; // cambia a verdadero cuando se convierte en movimiento
-    private int id;
+    private List<PedidoLinea> lineasPedidoLineas;
+
 
     public Pedido() {
         this.lineasPedidoLineas = new ArrayList<>();
@@ -122,7 +124,7 @@ public class Pedido {
                 montoTota = montoTota + generic.getCantidad()*generic.getMontoIndividualVenta();
             }
         }
-        this.montoTotal = montoTota;
+        this.montoTotal = (double) (Math.round(montoTota*10)/10);
     }
 
     public void setIndexProducto(int index, PedidoLinea pedidoLinea){
@@ -164,9 +166,18 @@ public class Pedido {
     }
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [id=" + id + ", idCuenta=" + idCuenta + ", tipoDePedido=" + tipoDePedido
-                + ", montoTotal=" + montoTotal + ", ejecutado=" + ejecutado +  ", lineasPedidoLineas=" + lineasPedidoLineas + "]";
+        return getClass().getSimpleName()
+                + ", id="+id
+                + " [idCuenta=" + idCuenta
+                + ", tipoDePedido=" + tipoDePedido
+                + ", montoTotal=" + montoTotal
+                + ", ejecutado=" + ejecutado
+                +  ", lineasPedidoLineas="
+                + lineasPedidoLineas
+                + "]";
     }
+
+
 
 
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 public class Balances {
     private List<Balance> balances;
+    private static final String archivo = "balances.csv";
 
     public Balances(List<Balance> balances) {
         this.balances = balances;
@@ -15,7 +16,27 @@ public class Balances {
 
     public Balances() {
     balances= new ArrayList<>();
+        List<Balance> listas = persistenciaLeer();
+        if(listas != null){
+            balances= new ArrayList<>(listas);}
     }
+
+    private List<Balance> persistenciaLeer(){
+        ArchivoUtil.crearArchivo(archivo);
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Balance.class);
+        return archivoUtil.leerArchivo(";");
+    }
+
+    private void persistenciaEscribir(){
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Balance.class);
+        archivoUtil.escribirArchivo(this.balances,";");
+    }
+
+    public void persistenciaEscribirMock(){
+        ArchivoUtil archivoUtil = new ArchivoUtil<>(archivo,Balance.class);
+        archivoUtil.escribirArchivo(this.balances,";");
+    }
+
 
     public List<Balance> getBalances() {
         return balances;
@@ -24,8 +45,14 @@ public class Balances {
     public void setBalances(List<Balance> balances) {
         this.balances = balances;
     }
+
+    public void addMock(Balance balance) {
+        this.balances.add(balance);
+    }
+
     public void add(Balance balance){
         this.balances.add(balance);
+        this.persistenciaEscribir();
     }
 
     public List<Listas> informeBalance() {
