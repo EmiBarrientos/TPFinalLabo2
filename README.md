@@ -12,7 +12,6 @@ Sistema integral de gestión de depósitos, desarrollado en Java, orientado a op
 
 🧩 Funcionalidades
 
-📦 Ejecución del proyecto
 
 🎓 Información académica
 
@@ -30,22 +29,39 @@ Registro de operaciones básicas.
 
 Interfaz de uso académico orientada al aprendizaje de buenas prácticas.
 
-🛠️ Tecnologías utilizadas
-Tecnología	Uso principal
-Java 17 / 20	Lenguaje de programación principal
-POO (Programación Orientada a Objetos)	Organización y diseño del sistema
-Swing / Consola	Interfaz y visualización de datos (según implementación)
-MySQL (opcional)	Almacenamiento persistente
-Git & GitHub	Control de versiones y repositorio del equipo
-IntelliJ IDEA / Eclipse	IDEs usados en el desarrollo
-🏗️ Arquitectura general
-com.depotmanager
-├── model          → Entidades principales (Producto, Usuario, Stock, etc.)
-├── service        → Lógica de negocio y operaciones
-├── controller     → Manejo de la interacción con el usuario
-├── util           → Clases de apoyo y utilidades
-└── main           → Punto de entrada de la aplicación
+---
+## 🛠️ Tecnologías utilizadas
 
+| Tecnología               | Uso principal                                                   |
+|--------------------------|-----------------------------------------------------------------|
+| Java 17 / 20             | Lenguaje de programación utilizado para construir la aplicación |
+| Programación Orientada a Objetos |   	Organización y diseño del sistema |
+| Swing       |  Consola	Interfaz y visualización de datos          |
+|MySQL     | Almacenamiento persistente             |
+|IntelliJ IDEA    | IDEs usados en el desarrollo              |
+
+
+
+
+---
+
+```
+com.depotmanager.scr.main.java
+
+├── com                
+    └── conexionDB
+    └── enums
+    └──excepciones
+    └──menu
+    └──Menus
+    └──models
+    └──validaciones
+├── org.example                       
+├── main                   
+├── out
+ ```
+
+---
 🧩 Funcionalidades
 
 🔹 Alta, baja y modificación de productos
@@ -68,19 +84,15 @@ Persistencia opcional en base de datos.
 
 Trabajo en equipo con control de versiones (Git & GitHub).
 
-👥 Autores
 
-Emiliano Barrientos
 
-Agustín Malagutti
 
-Luciano Fraticelli
+## 👥 Autores
 
-Tobías Miri
+- **Emiliano Barrientos - Malagutti Agustin - Luciano Fraticelli - Tobías Miri - Julieta Gerez**
+- Universidad Tecnológica Nacional (UTN)
+- Materia: **Programación II**
+- Profesor: **Sergio Garguir**
+- Fecha: **Junio 2024**
 
-Julieta Gerez
-
-📍 Universidad Tecnológica Nacional (UTN)
-📚 Materia: Laboratorio de Programación II
-👨‍🏫 Profesor: Sergio Garguir
-📆 Fecha: 16/06/2024
+---
