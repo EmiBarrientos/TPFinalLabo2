@@ -55,22 +55,6 @@ com.depotmanager
 🔹 Validaciones básicas de datos de entrada
 🔹 Persistencia en base de datos (si se configura MySQL)
 
-📦 Ejecución del proyecto
-
-Clonar el repositorio:
-
-git clone https://github.com/EmiBarrientos/TPFinalLabo2.git
-cd TPFinalLabo2
-
-
-Compilar el código desde tu IDE o línea de comandos.
-
-javac -d bin src/**/*.java
-
-
-Ejecutar la clase principal (reemplazar por la tuya):
-
-java -cp bin com.depotmanager.Main
 
 🎓 Información académica
 
